@@ -21,8 +21,29 @@ configure_file (
 set(xeus_REQUIRED_VERSION 0.21.1)
 set(cppzmq_REQUIRED_VERSION 4.3.0)
 
-find_package(xeus ${xeus_REQUIRED_VERSION} REQUIRED)
-find_package(cppzmq ${cppzmq_REQUIRED_VERSION} REQUIRED)
+set(BUILD_TESTS "OFF")
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/libzmq)
+
+set(CPPZMQ_BUILD_TESTS "OFF")
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/cppzmq)
+set(cppzmq_DIR ${CMAKE_BINARY_DIR}/third-party/cppzmq)
+
+set(BUILD_TESTS "OFF")
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/xtl)
+set(xtl_DIR ${CMAKE_BINARY_DIR}/third-party/xtl)
+
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/nlohmann_json)
+set(nlohmann_json_DIR ${CMAKE_BINARY_DIR}/third-party/nlohmann_json)
+
+set(BUILD_TESTING "OFF")
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/xeus)
+
+set(TON_ONLY_TONLIB "ON")
+set(TON_USE_ROCKSDB "OFF")
+set(TON_USE_ABSEIL "OFF")
+set(TDDB_USE_ROCKSDB "OFF")
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/ton)
 
 # Flags
 # =====
@@ -51,6 +72,7 @@ set(MY_KERNEL_SRC
 # My kernel executable
 add_executable(${EXECUTABLE_NAME} src/main.cpp ${MY_KERNEL_SRC} )
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE xeus)
+target_link_libraries(${EXECUTABLE_NAME} PUBLIC fift-lib)
 
 if (APPLE)
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES

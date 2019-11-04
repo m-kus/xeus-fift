@@ -12,8 +12,8 @@ int main(int argc, char* argv[])
     xeus::xconfiguration config = xeus::load_configuration(file_name);
 
     // Create interpreter instance
-    using interpreter_ptr = std::unique_ptr<custom::custom_interpreter>;
-    interpreter_ptr interpreter = interpreter_ptr(new custom::custom_interpreter());
+    using interpreter_ptr = std::unique_ptr<xfift::interpreter>;
+    interpreter_ptr interpreter = interpreter_ptr(new xfift::interpreter(argc, argv));
 
     // Create kernel instance and start it
     xeus::xkernel kernel(config, xeus::get_user_name(), std::move(interpreter));

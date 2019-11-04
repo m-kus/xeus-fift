@@ -1,15 +1,28 @@
 #include <iostream>
+
+// #include "ton/crypto/fift/Fift.h"
+// #include "ton/crypto/fift/Dictionary.h"
+// #include "ton/crypto/fift/SourceLookup.h"
+// #include "ton/crypto/fift/words.h"
+
 #include "fift_interpreter.hpp"
+
 
 namespace xfift
 {
+    interpreter::interpreter(int argc, const char* const* argv)
+    {
+
+    }
+
+    interpreter::~interpreter() {}
 
     nl::json interpreter::execute_request_impl(int execution_counter, // Typically the cell number
-                                                      const std::string& /*code*/, // Code to execute
-                                                      bool /*silent*/,
-                                                      bool /*store_history*/,
-                                                      nl::json /*user_expressions*/,
-                                                      bool /*allow_stdin*/)
+                                               const std::string& /*code*/, // Code to execute
+                                               bool /*silent*/,
+                                               bool /*store_history*/,
+                                               nl::json /*user_expressions*/,
+                                               bool /*allow_stdin*/)
     {
         // You can use the C-API of your target language for executing the code,
         // e.g. `PyRun_String` for the Python C-API
@@ -104,12 +117,12 @@ namespace xfift
     nl::json interpreter::kernel_info_request_impl()
     {
         nl::json result;
-        result["implementation"] = "my_kernel";
+        result["implementation"] = "xeus-fift";
         result["implementation_version"] = "0.1.0";
-        result["language_info"]["name"] = "python";
-        result["language_info"]["version"] = "3.7";
-        result["language_info"]["mimetype"] = "text/x-python";
-        result["language_info"]["file_extension"] = ".py";
+        result["language_info"]["name"] = "fift";
+        result["language_info"]["version"] = "0.5";
+        result["language_info"]["mimetype"] = "text/x-fift";
+        result["language_info"]["file_extension"] = ".fif";
         return result;
     }
 
