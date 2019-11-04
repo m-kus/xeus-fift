@@ -1,0 +1,18 @@
+[submodule "third-party/libzmq"]
+	path = third-party/libzmq
+	url = https://github.com/zeromq/libzmq.git
+[submodule "third-party/cppzmq"]
+	path = third-party/cppzmq
+	url = https://github.com/zeromq/cppzmq.git
+[submodule "third-party/xtl"]
+	path = third-party/xtl
+	url = https://github.com/xtensor-stack/xtl.git
+[submodule "third-party/xeus"]
+	path = third-party/xeus
+	url = https://github.com/QuantStack/xeus.git
+[submodule "third-party/ton"]
+	path = third-party/ton
+	url = https://github.com/ton-blockchain/ton.git
+[submodule "third-party/nlohmann_json"]
+	path = third-party/nlohmann_json
+	url = https://github.com/nlohmann/json.git
