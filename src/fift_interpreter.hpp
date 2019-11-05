@@ -1,21 +1,32 @@
 #pragma once
 
-#include "xeus/xinterpreter.hpp"
-
-#include "nlohmann/json.hpp"
+#include <xeus/xinterpreter.hpp>
+#include <nlohmann/json.hpp>
+#include <ton/crypto/fift/Fift.h>
 
 using xeus::xinterpreter;
+using fift::Fift;
 
 namespace nl = nlohmann;
 
 namespace xfift
 {
+    struct Params {
+        std::vector<std::string> library_source_files;
+        std::vector<std::string> source_include_path;
+        std::string ton_db_path;
+        std::string kernel_settings_path;
+        bool fift_preload = true;
+        bool no_env = false;
+        int verbosity_level = VERBOSITY_NAME(INFO);
+    };
+
     class interpreter : public xinterpreter
     {
 
     public:
 
-        interpreter(int argc, const char* const* argv);
+        interpreter(const Params&);
         virtual ~interpreter();
 
     private:
@@ -47,5 +58,9 @@ namespace xfift
         nl::json kernel_info_request_impl() override;
 
         void shutdown_request_impl() override;
+
+    private:
+
+        Fift fift_;
     };
 }

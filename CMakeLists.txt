@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.4.3)
 project(xeus-fift)
 
 set(EXECUTABLE_NAME xeus-fift)
+set(BUILD_SHARED_LIBS NO CACHE BOOL "" FORCE)
+set(BUILD_STATIC_LIBS YES CACHE BOOL "" FORCE)
 
 # Configuration
 # =============
@@ -21,28 +23,28 @@ configure_file (
 set(xeus_REQUIRED_VERSION 0.21.1)
 set(cppzmq_REQUIRED_VERSION 4.3.0)
 
-set(BUILD_TESTS "OFF")
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/libzmq)
 
-set(CPPZMQ_BUILD_TESTS "OFF")
+set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/cppzmq)
 set(cppzmq_DIR ${CMAKE_BINARY_DIR}/third-party/cppzmq)
 
-set(BUILD_TESTS "OFF")
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/xtl)
 set(xtl_DIR ${CMAKE_BINARY_DIR}/third-party/xtl)
 
-set(JSON_BuildTests OFF CACHE INTERNAL "")
+set(JSON_BuildTests OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/nlohmann_json)
 set(nlohmann_json_DIR ${CMAKE_BINARY_DIR}/third-party/nlohmann_json)
 
-set(BUILD_TESTING "OFF")
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/xeus)
 
-set(TON_ONLY_TONLIB "ON")
-set(TON_USE_ROCKSDB "OFF")
-set(TON_USE_ABSEIL "OFF")
-set(TDDB_USE_ROCKSDB "OFF")
+set(TON_ONLY_TONLIB ON CACHE BOOL "" FORCE)
+set(TON_USE_ROCKSDB OFF CACHE BOOL "" FORCE)
+set(TON_USE_ABSEIL OFF CACHE BOOL "" FORCE)
+set(TDDB_USE_ROCKSDB OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/ton)
 
 # Flags
@@ -71,8 +73,17 @@ set(MY_KERNEL_SRC
 
 # My kernel executable
 add_executable(${EXECUTABLE_NAME} src/main.cpp ${MY_KERNEL_SRC} )
-target_link_libraries(${EXECUTABLE_NAME} PRIVATE xeus)
+target_include_directories(${EXECUTABLE_NAME} PUBLIC 
+    ${CMAKE_SOURCE_DIR}/third-party
+    ${CMAKE_SOURCE_DIR}/third-party/xeus/include
+    ${CMAKE_SOURCE_DIR}/third-party/nlohmann_json/include
+    ${CMAKE_SOURCE_DIR}/third-party/libzmq/include
+    ${CMAKE_SOURCE_DIR}/third-party/xtl/include
+    ${CMAKE_SOURCE_DIR}/third-party/cppzmq
+)
+target_link_libraries(${EXECUTABLE_NAME} PUBLIC xeus_static)
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC fift-lib)
+
 
 if (APPLE)
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES

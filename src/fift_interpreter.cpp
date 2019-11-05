@@ -1,18 +1,59 @@
 #include <iostream>
 
-// #include "ton/crypto/fift/Fift.h"
-// #include "ton/crypto/fift/Dictionary.h"
-// #include "ton/crypto/fift/SourceLookup.h"
-// #include "ton/crypto/fift/words.h"
+#include <ton/crypto/fift/words.h>
 
 #include "fift_interpreter.hpp"
 
-
 namespace xfift
 {
-    interpreter::interpreter(int argc, const char* const* argv)
-    {
+    Fift build_interpreter(const Params& params) {
+        fift::Fift::Config config;
 
+        config.source_lookup = fift::SourceLookup(std::make_unique<fift::OsFileLoader>());
+        for (auto& path : params.source_include_path) {
+            config.source_lookup.add_include_path(path);
+        }
+
+        if (!params.ton_db_path.empty()) {
+            auto r_ton_db = vm::TonDbImpl::open(params.ton_db_path);
+            if (r_ton_db.is_error()) {
+                LOG(ERROR) << "Error opening ton database: " << r_ton_db.error().to_string();
+                std::exit(2);
+            }
+            config.ton_db = r_ton_db.move_as_ok();
+            // TODO: reset at the end
+        }
+
+        fift::init_words_common(config.dictionary);
+        fift::init_words_vm(config.dictionary);
+        fift::init_words_ton(config.dictionary);
+
+        fift::Fift fift(std::move(config));
+
+        if (params.fift_preload) {
+            auto status = fift.interpret_file("Fift.fif", "");
+            if (status.is_error()) {
+                LOG(ERROR) << "Error interpreting standard preamble file `Fift.fif`: " << status.error().message()
+                           << "\nCheck that correct include path is set by -I or by FIFTPATH environment variable, "
+                              "or disable standard preamble by -n.\n";
+                std::exit(2);
+            }
+        }
+
+        for (auto source : params.library_source_files) {
+            auto status = fift.interpret_file(source, "");
+            if (status.is_error()) {
+                LOG(ERROR) << "Error interpreting preloaded file `" << source << "`: " << status.error().message();
+                std::exit(2);
+            }
+        }
+
+        return std::move(fift);
+    }
+
+    interpreter::interpreter(const Params& params)
+        : fift_(build_interpreter(params))
+    { 
     }
 
     interpreter::~interpreter() {}
