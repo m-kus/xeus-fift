@@ -1,0 +1,13 @@
+language: cpp
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - ./xeus-fift-test
