@@ -23,7 +23,7 @@ namespace str {
         return lstrip(rstrip(s));
     }
 
-    static void split(std::string s, char delim, std::vector<std::string>& res) {
+    static inline void split(std::string s, char delim, std::vector<std::string>& res) {
         td::Parser parser(s);
         while (!parser.empty()) {
             auto chunk = parser.read_till_nofail(delim);

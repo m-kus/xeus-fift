@@ -1,3 +1,4 @@
 build/
 share/jupyter/kernels/fift/kernel.json
 .idea/
+__pycache__/
