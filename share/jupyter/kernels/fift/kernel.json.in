@@ -1,5 +1,9 @@
 {
   "display_name": "Fift",
-  "argv": [],
+  "argv": [
+    "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@EXECUTABLE_NAME@",
+    "-f",
+    "{connection_file}"
+  ],
   "language": "Fift"
 }

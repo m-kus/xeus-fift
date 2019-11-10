@@ -1,2 +1,3 @@
-build/*
+build/
 share/jupyter/kernels/fift/kernel.json
+.idea/

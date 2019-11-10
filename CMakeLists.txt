@@ -65,15 +65,10 @@ endif()
 # Target and link
 # ===============
 
-# my_kernel source files
-set(MY_KERNEL_SRC
-    src/fift_interpreter.cpp
-    src/fift_interpreter.hpp
-)
+file(GLOB_RECURSE XFIFT_SRC "${CMAKE_SOURCE_DIR}/src/*")
 
-# My kernel executable
-add_executable(${EXECUTABLE_NAME} src/main.cpp ${MY_KERNEL_SRC} )
-target_include_directories(${EXECUTABLE_NAME} PUBLIC 
+add_executable(${EXECUTABLE_NAME} src/main.cpp ${XFIFT_SRC})
+include_directories(${EXECUTABLE_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/third-party
     ${CMAKE_SOURCE_DIR}/third-party/xeus/include
     ${CMAKE_SOURCE_DIR}/third-party/nlohmann_json/include
@@ -81,9 +76,10 @@ target_include_directories(${EXECUTABLE_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/third-party/xtl/include
     ${CMAKE_SOURCE_DIR}/third-party/cppzmq
 )
-target_link_libraries(${EXECUTABLE_NAME} PUBLIC xeus_static)
-target_link_libraries(${EXECUTABLE_NAME} PUBLIC fift-lib)
-
+target_link_libraries(${EXECUTABLE_NAME} PUBLIC 
+    xeus_static 
+    fift-lib
+)
 
 if (APPLE)
     set_target_properties(${EXECUTABLE_NAME} PROPERTIES
@@ -99,6 +95,35 @@ endif()
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES
     INSTALL_RPATH_USE_LINK_PATH TRUE
 )
+
+# Testing
+# =======
+
+set(XFIFT_TEST_EXE "xeus-fift-test")
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/googletest)
+
+set(SRC_TESTS
+    "${CMAKE_SOURCE_DIR}/src/xfift.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfift.hpp"
+    "${CMAKE_SOURCE_DIR}/test/test_xfift.cpp"
+    "${CMAKE_SOURCE_DIR}/test/main.cpp"
+)
+
+add_executable(${XFIFT_TEST_EXE} ${SRC_TESTS})
+target_include_directories(${XFIFT_TEST_EXE} PUBLIC 
+    "${CMAKE_SOURCE_DIR}/test" 
+    "${CMAKE_SOURCE_DIR}/src" 
+    "${gtest_SOURCE_DIR}/include"
+)
+target_link_libraries(${XFIFT_TEST_EXE} PUBLIC
+    gtest 
+    gtest_main 
+    xeus_static 
+    fift-lib
+)
+
+add_test(NAME "test" COMMAND test)
 
 # Installation
 # ============
