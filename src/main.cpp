@@ -1,13 +1,9 @@
-#include "xinterpreter.hpp"
-
 #include <memory>
 #include <getopt.h>
-
 #include <xeus/xkernel.hpp>
 #include <xeus/xkernel_configuration.hpp>
-#include <td/utils/logging.h>
-#include <td/utils/port/path.h>
-#include <td/utils/Parser.h>
+
+#include "xinterpreter.hpp"
 
 
 std::string extract_filename(int& argc, char* argv[])

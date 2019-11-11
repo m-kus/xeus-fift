@@ -1,9 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <sstream>
-#include <streambuf>
-
 #include <ton/crypto/fift/Fift.h>
 #include <ton/crypto/fift/words.h>
 
@@ -42,9 +38,15 @@ namespace xfift {
 
         XFift();
         virtual ~XFift();
-        
+
         void configure();
         XResult do_interpret(const std::string& expr);
-    };
 
+        std::size_t code_complete(const std::string& line, 
+                                  std::size_t cursor_pos, 
+                                  std::vector<std::string> matches); 
+                                  
+        std::string code_inspect(const std::string& line, 
+                                 std::size_t cursor_pos);      
+    };
 }

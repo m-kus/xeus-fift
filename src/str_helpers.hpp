@@ -1,29 +1,22 @@
-#include <algorithm> 
-#include <functional> 
-#include <cctype>
-#include <locale>
+#pragma once
 
 #include <td/utils/Parser.h>
 
 namespace str {
 
-    static inline std::string &lstrip(std::string &s) {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-                std::not1(std::ptr_fun<int, int>(std::isspace))));
-        return s;
+    static inline std::string strip(const std::string& s) 
+    {
+        if (s.empty()) {
+            return s;
+        }
+        std::size_t first_scan = s.find_first_not_of(' ');
+        std::size_t first = first_scan == std::string::npos ? s.length() : first_scan;
+        std::size_t last = s.find_last_not_of(' ');
+        return s.substr(first, last - first + 1);
     }
 
-    static inline std::string &rstrip(std::string &s) {
-        s.erase(std::find_if(s.rbegin(), s.rend(),
-                std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-        return s;
-    }
-
-    static inline std::string &strip(std::string &s) {
-        return lstrip(rstrip(s));
-    }
-
-    static inline void split(std::string s, char delim, std::vector<std::string>& res) {
+    static inline void split(std::string s, char delim, std::vector<std::string>& res) 
+    {
         td::Parser parser(s);
         while (!parser.empty()) {
             auto chunk = parser.read_till_nofail(delim);

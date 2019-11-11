@@ -92,8 +92,7 @@ namespace xfift {
 
         try {
             res.code = fift::funny_interpret_loop(ctx_);
-            res.output = ssout.str();
-            str::rstrip(res.output);
+            res.output = str::strip(ssout.str());
         } catch (fift::IntError ab) {
             res = XResult(ab);
             res.traceback.push_back(sserr.str());
@@ -103,5 +102,54 @@ namespace xfift {
         }
         
         return std::move(res);
+    }
+
+    std::size_t XFift::code_complete(const std::string& line, 
+                                     std::size_t cursor_pos, 
+                                     std::vector<std::string> matches)
+    {
+        std::size_t word_offset = 0;
+        bool maybe_include = false;
+        
+        for (auto i = cursor_pos; i > 0; --i) {
+            if (line[i] == ' ') {
+                word_offset = i + 1;
+                break;
+            } else if (line[i] == '"') {
+                word_offset = i + 1;
+                maybe_include = true;
+                break;
+            }
+        }
+        
+        std::string prefix = line.substr(word_offset, cursor_pos);
+        
+        if (maybe_include) {
+            // TODO
+        } else {
+            std::for_each(dictionary_.begin(), dictionary_.end(), [&](const std::pair<std::string, WordRef>& x) {
+                if (prefix.empty() || std::equal(prefix.begin(), prefix.end(), x.first.begin())) {
+                    matches.push_back(x.first);
+                }
+            });
+        }
+
+        return word_offset;
+    }
+
+    std::string XFift::code_inspect(const std::string& line, std::size_t cursor_pos) {
+        static std::unordered_map<std::string, std::string> docs = {
+            {"include", ""}
+        };
+
+        std::string word = line.substr(0, cursor_pos);
+        // TODO
+
+        auto docstring = docs.find(word);
+        if (docstring == docs.end()) {
+            return std::string();
+        } else {
+            return docstring->second;
+        }
     }
 }
