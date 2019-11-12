@@ -22,7 +22,7 @@ namespace xfift
 
             nl::json pub_data;
             pub_data["text/plain"] = res.output;
-            publish_execution_result(execution_counter, std::move(pub_data), nl::json());
+            publish_execution_result(execution_counter, std::move(pub_data), nl::json::object());
         } else {
             kernel_res["status"] = "error";
             kernel_res["ename"] = res.ename;
