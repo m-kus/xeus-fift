@@ -138,6 +138,8 @@ namespace xfift {
         std::size_t succ_pos = line.find_first_of(' ', cursor_pos);
         if (pred_pos == std::string::npos) {
             pred_pos = 0;
+        } else {
+            pred_pos++;
         }
         if (succ_pos == std::string::npos) {
             succ_pos = line.size();

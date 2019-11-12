@@ -119,7 +119,7 @@ def get_word_definitions() -> list:
     fiftbase_tex = read_file('third-party/ton/doc/fiftbase.tex') 
     sections = re.split(r'\\clearpage', fiftbase_tex)
     assert sections[-1].startswith('\n\\appendix\\myappendix'), "Cannot locate Appendix"
-    appendix = '\\begin{document}' + sections[-1].replace('[', ' ').replace(']', ' ')  # TexSoup does not understand [ ]
+    appendix = '\\begin{document}' + sections[-1].replace('[', '\\lsqbr ').replace(']', '\\rsqbr ')
     soup = TexSoup(appendix)
     items = soup.find_all('item')
     return list(map(parse_item, items))

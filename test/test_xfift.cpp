@@ -57,3 +57,12 @@ TEST(XFiftTest, SimpleInspect)
     std::string docstring = fift.code_inspect("include", 4);
     ASSERT_TRUE(docstring.size() > 50);
 }
+
+TEST(XFiftTest, EndLineInspect)
+{
+    xfift::XFift fift;
+    fift.configure();
+
+    std::string docstring = fift.code_inspect("four .s", 7);
+    ASSERT_TRUE(docstring.size() > 50);
+}
