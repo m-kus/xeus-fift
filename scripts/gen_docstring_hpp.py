@@ -16,6 +16,28 @@ def write_file(rel_path, data):
         return f.write(data)
 
 
+def join_contents(token):
+    res = ''
+    for content in token.contents:
+        if isinstance(content, TexCmd):
+            if content.name == 'tt':
+                continue
+            if content.name == 'underline':
+                return join_contents(content)
+            res += content.name
+        elif isinstance(content, str):
+            res += content
+        else:
+            break
+    return res.strip()
+
+
+def escape_tex(s):
+    return s.replace('\\', '\\\\') \
+            .replace('"', '\\"') \
+            .replace('\n', '\\\\n')
+
+
 def math_replace(expr):
     symbols = {
         r'\\b': '',
@@ -44,7 +66,7 @@ def filter_output(s):
     s = s.replace('``', '“')
     s = s.replace('\'\'', '”')
     s = s.replace('\\', '')
-    s = re.sub('\s+', ' ', s)
+    s = re.sub(r'\s+', ' ', s)
     return s.strip()
 
 def expand_cmd(cmd):
@@ -86,17 +108,10 @@ def parse_token(token):
         assert False, token
 
 
-def escape_tex(s):
-    return s.replace('\\', '\\\\') \
-            .replace('"', '\\"') \
-            .replace('\n', '\\\\n')
-
-
 def parse_item(item):
-    text = parse_token(item)
     return dict(
-        word=escape_tex(text.split()[0]), 
-        definition=escape_tex(text)
+        word=escape_tex(join_contents(next(item.tokens))), 
+        definition=escape_tex(parse_token(item))
     )
 
 
