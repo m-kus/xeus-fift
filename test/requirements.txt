@@ -1,2 +1,0 @@
-pytest
-jupyter_kernel_test

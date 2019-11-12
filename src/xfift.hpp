@@ -3,7 +3,7 @@
 #include <ton/crypto/fift/Fift.h>
 #include <ton/crypto/fift/words.h>
 
-#include "str_helpers.hpp"
+#include "helpers.hpp"
 
 using namespace fift;
 using namespace vm;

@@ -16,103 +16,95 @@ def write_file(rel_path, data):
         return f.write(data)
 
 
-def join_contents(token):
-    res = ''
-    for content in token.contents:
-        if isinstance(content, TexCmd):
-            if content.name == 'tt':
-                continue
-            if content.name == 'underline':
-                return join_contents(content)
-            res += content.name
-        elif isinstance(content, str):
-            res += content
-        else:
-            break
-    return res.strip()
-
-
-def escape_tex(s):
+def escape(s):
     return s.replace('\\', '\\\\') \
             .replace('"', '\\"') \
             .replace('\n', '\\\\n')
 
 
-def math_replace(expr):
+def expand_symbols(s):
     symbols = {
-        r'\\b': '',
-        r'\\lfloor\s?': '⌊',
-        r'\\rfloor\s?': '⌋',
-        r'\\langle\s?': '〈',
-        r'\\rangle\s?': '〉',
-        r'\\textit{(.+)}': '\\1',
-        r'\\leq\s?': '≤',
-        r'\\geq\s?': '≥',
-        r'\\dots\s?': '…',
-        r'\\ldots\s?': '…',
-        r'\\lsqbr\s?': '[',
-        r'\\rsqbr\s?': ']',
+        # symbols
+        r'\\lfloor\s?': ' ⌊',
+        r'\s?\\rfloor': '⌋ ',
+        r'\\lceil\s?': ' ⌈',
+        r'\s?\\rceil': '⌉ ',
+        r'\\langle\s?': '❬',
+        r'\s?\\rangle': '❭',
+        r'\\lsqbr': '[',
+        r'\\rsqbr': ']',
+        r'\\textit\{([^\}]+)\}': '\\1',
+        r'\\leq': '≤',
+        r'\\geq': '≥',
+        r'\\neq': '≠',
+        r'\\oplus': '⊕',
+        r'\\max': 'max',
+        r'\\min': 'min',
+        r'\\dots': '…',
+        r'\\ldots': '…',
+        r'\\cdot': '⋅',
+        r'\\Delta': 'Δ',
+        r'``': '“',
+        r'\'\'': '”',
+        r'\\b': ' ',
+        r'\s\\Sha\s': ' SHA256 ',
+        # syntax
+        r'\s([\.,;:])': '\\1',
+        r'~': ' ',
+        r'\\/': '',
+        r'\\([\$\{\}%&])': '\\1',
+        r'\s+': ' ',
     }
-    for cmd, symbol in symbols.items():
-        expr = re.sub(cmd, symbol, expr)
-    return expr
-
-
-def filter_output(s):
-    s = re.sub(r'\s([\.,;:])', '\\1', s)
-    s = re.sub(r', cf\.[^\.]*', '', s)
-    s = s.replace('~', ' ')
-    s = s.replace('\\$', '$')
-    s = s.replace('``', '“')
-    s = s.replace('\'\'', '”')
-    s = s.replace('\\', '')
-    s = re.sub(r'\s+', ' ', s)
+    for pattern, symbol in symbols.items():
+        s = re.sub(pattern, symbol, s)
+    assert '\\' not in s, s
     return s.strip()
-
-def expand_cmd(cmd):
-    symbols = {
-        'lsqbr': '[',
-        'rsqbr': ']',
-        'dots': '…',
-        'ldots': '…',
-        'tt': ' ',
-    }
-    if cmd in symbols:
-        return symbols[cmd]
-    else:
-        assert cmd in {'tt', 'em', '/', 'ptref', '$', 'item', 'cite', '/s'}, cmd
-        return ''
-
-
-def join_tokens(tokens: list, delim=''):
-    return delim.join(filter(lambda x: x, map(parse_token, tokens)))
 
 
 def parse_token(token):
     if isinstance(token, str):
         return token.strip()
     elif isinstance(token, TexCmd):
-        if token.name[0] in '#_{}':
-            return token.name
-        elif token.name == 'underline':
-            return join_tokens(token.contents)
+        if token.name in {'tt', 'em', '/', 'ptref', 'item', 'cite', '/s', 'underline'}:
+            return ''.join(map(parse_token, token.contents))
+        elif token.name in {'lsqbr', 'rsqbr', 'dots', 'ldots'}:
+            return f'\\{token.name}'
         else:
-            return expand_cmd(token.name)
+            assert len(list(token.contents)) == 0, token
+            return token.name.strip()
     elif isinstance(token, RArg):
-        return join_tokens(token.contents)
+        return ''.join(map(parse_token, token.contents))
     elif isinstance(token, TexEnv):
-        return math_replace(join_tokens(token.contents))
+        return ''.join(map(parse_token, token.contents))
     elif isinstance(token, TexNode):
-        return filter_output(join_tokens(token.tokens, delim=' '))
+        return ' '.join(map(parse_token, token.tokens))
     else:
         assert False, token
 
 
+def parse_word(item):
+    rarg = next(iter(item.tokens))
+    if not isinstance(rarg, RArg):
+        return None
+    
+    contents = list(rarg.contents)
+    assert isinstance(contents[0], TexCmd) and contents[0].name == 'tt'
+    
+    if isinstance(contents[1], TexCmd) and contents[1].name == 'underline':
+        res = contents[1].tokens
+    else:
+        res = contents[1:]
+    
+    return ''.join(map(parse_token, res))
+
+
 def parse_item(item):
-    return dict(
-        word=escape_tex(join_contents(next(item.tokens))), 
-        definition=escape_tex(parse_token(item))
-    )
+    word = parse_word(item)
+    if word:
+        return dict(
+            word=escape(expand_symbols(word)), 
+            definition=escape(expand_symbols(parse_token(item)))
+        )
 
 
 def get_word_definitions() -> list:
@@ -122,7 +114,7 @@ def get_word_definitions() -> list:
     appendix = '\\begin{document}' + sections[-1].replace('[', '\\lsqbr ').replace(']', '\\rsqbr ')
     soup = TexSoup(appendix)
     items = soup.find_all('item')
-    return list(map(parse_item, items))
+    return list(filter(lambda x: x, map(parse_item, items)))
 
 
 def generate_docs():
