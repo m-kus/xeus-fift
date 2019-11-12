@@ -44,7 +44,7 @@ namespace xfift {
 
         std::size_t code_complete(const std::string& line, 
                                   std::size_t cursor_pos, 
-                                  std::vector<std::string> matches); 
+                                  std::vector<std::string>& matches); 
                                   
         std::string code_inspect(const std::string& line, 
                                  std::size_t cursor_pos);      

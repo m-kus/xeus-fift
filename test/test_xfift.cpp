@@ -35,3 +35,25 @@ TEST(XFiftTest, MultiRequest)
     ASSERT_EQ(0, res1.code);
     ASSERT_EQ("3", res1.output);
 }
+
+TEST(XFiftTest, SimpleComplete)
+{
+    xfift::XFift fift;
+    fift.configure();
+
+    std::vector<std::string> matches;
+    auto offset = fift.code_complete("\"Asm.fif\" inc", 13, matches);
+
+    ASSERT_EQ(1, matches.size());
+    ASSERT_EQ("include", matches[0]);
+    ASSERT_EQ(10, offset);
+}
+
+TEST(XFiftTest, SimpleInspect)
+{
+    xfift::XFift fift;
+    fift.configure();
+
+    std::string docstring = fift.code_inspect("include", 4);
+    ASSERT_TRUE(docstring.size() > 50);
+}

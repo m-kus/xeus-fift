@@ -12,7 +12,7 @@ namespace str {
         std::size_t first_scan = s.find_first_not_of(' ');
         std::size_t first = first_scan == std::string::npos ? s.length() : first_scan;
         std::size_t last = s.find_last_not_of(' ');
-        return s.substr(first, last - first + 1);
+        return std::move(s.substr(first, last - first + 1));
     }
 
     static inline void split(std::string s, char delim, std::vector<std::string>& res) 

@@ -71,6 +71,7 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "*.in": "cpp"
     }
 }

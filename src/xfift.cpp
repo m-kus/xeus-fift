@@ -3,6 +3,7 @@
 #include <td/utils/Slice.h>
 
 #include "xfift.hpp"
+#include "docstring.hpp"
 
 namespace xfift {
 
@@ -106,50 +107,43 @@ namespace xfift {
 
     std::size_t XFift::code_complete(const std::string& line, 
                                      std::size_t cursor_pos, 
-                                     std::vector<std::string> matches)
+                                     std::vector<std::string>& matches)
     {
         std::size_t word_offset = 0;
         bool maybe_include = false;
-        
-        for (auto i = cursor_pos; i > 0; --i) {
-            if (line[i] == ' ') {
-                word_offset = i + 1;
-                break;
-            } else if (line[i] == '"') {
-                word_offset = i + 1;
-                maybe_include = true;
-                break;
-            }
+
+        std::size_t delim_pos = line.find_last_of(" \"", cursor_pos);
+        if (delim_pos != std::string::npos) {
+            word_offset = std::min(delim_pos + 1, cursor_pos);
+            maybe_include = line[delim_pos] == '"';
         }
-        
-        std::string prefix = line.substr(word_offset, cursor_pos);
-        
+             
+        std::string prefix = line.substr(word_offset, cursor_pos - word_offset);   
         if (maybe_include) {
             // TODO
         } else {
             std::for_each(dictionary_.begin(), dictionary_.end(), [&](const std::pair<std::string, WordRef>& x) {
                 if (prefix.empty() || std::equal(prefix.begin(), prefix.end(), x.first.begin())) {
-                    matches.push_back(x.first);
+                    matches.push_back(str::strip(x.first));
                 }
             });
         }
 
-        return word_offset;
+        return word_offset; 
     }
 
-    std::string XFift::code_inspect(const std::string& line, std::size_t cursor_pos) {
-        static std::unordered_map<std::string, std::string> docs = {
-            {"include", ""}
-        };
-
-        std::string word = line.substr(0, cursor_pos);
-        // TODO
-
-        auto docstring = docs.find(word);
-        if (docstring == docs.end()) {
-            return std::string();
-        } else {
-            return docstring->second;
+    std::string XFift::code_inspect(const std::string& line, std::size_t cursor_pos) 
+    {
+        std::size_t pred_pos = line.find_last_of(' ', cursor_pos);
+        std::size_t succ_pos = line.find_first_of(' ', cursor_pos);
+        if (pred_pos == std::string::npos) {
+            pred_pos = 0;
         }
+        if (succ_pos == std::string::npos) {
+            succ_pos = line.size();
+        }
+
+        std::string word = line.substr(pred_pos, succ_pos - pred_pos);
+        return get_docstring(word);
     }
 }

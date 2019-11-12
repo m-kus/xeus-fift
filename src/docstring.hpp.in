@@ -1,0 +1,18 @@
+#include <string>
+#include <unordered_map>
+
+namespace xfift {
+    static inline std::string get_docstring(const std::string& word) {
+        static std::unordered_map<std::string, std::string> docs = {
+            {{"{word}", "{definition}"}}, // item_template
+        };
+        
+        if (!word.empty()) {
+            auto docstring = docs.find(word);
+            if (docstring != docs.end()) {
+                return docstring->second;
+            }
+        }
+        return std::string(); 
+    }
+}

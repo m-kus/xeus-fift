@@ -61,18 +61,18 @@ namespace xfift
                                                int cursor_pos,
                                                int detail_level)
     {
-        nl::json result;
+        nl::json kernel_res;
         std::string docstring = fift_.code_inspect(code, cursor_pos);
        
         if (!docstring.empty()) {
-            result["found"] = true;
-            result["text/plain"] = docstring;
+            kernel_res["found"] = true;
+            kernel_res["data"]["text/plain"] = docstring;
         } else {
-            result["found"] = false;
+            kernel_res["found"] = false;
         }
 
-        result["status"] = "ok";
-        return result;
+        kernel_res["status"] = "ok";
+        return kernel_res;
     }
 
     nl::json interpreter::is_complete_request_impl(const std::string& /*code*/)
@@ -88,9 +88,10 @@ namespace xfift
         nl::json kernel_res;
         kernel_res["implementation"] = "xeus-fift";
         kernel_res["implementation_version"] = "0.1.0";
-        kernel_res["language_info"]["name"] = "forth";
+        kernel_res["language_info"]["name"] = "fift";
         kernel_res["language_info"]["version"] = "0.5";
-        kernel_res["language_info"]["mimetype"] = "text/x-forth";
+        kernel_res["language_info"]["mimetype"] = "text/x-fift";
+        kernel_res["language_info"]["codemirror_mode"] = "text/x-fift";
         kernel_res["language_info"]["file_extension"] = ".fif";
         return kernel_res;
     }
