@@ -7,6 +7,18 @@ namespace xfift
         fift_.configure();
     }
 
+    nl::json make_pub_data(XResult res) {
+        std::stringstream ss;
+        if (!res.vmlog.empty()) {
+            ss << "<pre style=\"background-color: #ffe7d1; padding: 10px; margin-top: 5px;\">" << res.vmlog << "</pre>";
+        }
+        ss << "<pre style=\"padding: 3px;\">" << res.output << "</pre>";
+
+        nl::json data;
+        data["text/html"] = ss.str();
+        return std::move(data);
+    }
+
     nl::json interpreter::execute_request_impl(int execution_counter,
                                                const std::string& code,
                                                bool silent,
@@ -19,41 +31,56 @@ namespace xfift
         auto res = fift_.do_interpret(code);
         if (res.code == 0) {
             kernel_res["status"] = "ok";
-
-            nl::json pub_data;
-            pub_data["text/plain"] = res.output;
-            publish_execution_result(execution_counter, std::move(pub_data), nl::json::object());
+            if (!silent) {
+                publish_execution_result(execution_counter, make_pub_data(res), nl::json::object());
+            }
         } else {
             kernel_res["status"] = "error";
             kernel_res["ename"] = res.ename;
             kernel_res["evalue"] = res.evalue;
             kernel_res["traceback"] = res.traceback;
-
-            std::vector<std::string> traceback = res.traceback;
-            traceback.insert(traceback.begin(), res.ename + ": " + res.evalue);
-            publish_execution_error(res.ename, res.evalue, traceback);
+            publish_execution_error(res.ename, res.evalue, res.traceback);
         }
         
         return kernel_res;
     }
 
-    nl::json interpreter::complete_request_impl(const std::string& code,
-                                                int cursor_pos)
+    std::string parse_token(const std::string& line, 
+                            std::size_t cursor_pos, 
+                            std::size_t& token_begin, 
+                            std::size_t& token_end) 
+    {
+        token_begin = line.find_last_of(' ', cursor_pos > 0 ? cursor_pos - 1 : 0);
+        if (token_begin == std::string::npos) {
+            token_begin = 0;
+        } else {
+            token_begin++;
+        }
+        token_end = line.find_first_of(' ', cursor_pos); 
+        if (token_end == std::string::npos) {
+            token_end = line.size();
+        }
+        return std::move(line.substr(token_begin, token_end - token_begin));
+    }
+
+    nl::json interpreter::complete_request_impl(const std::string& code, int cursor_pos)
     {
         nl::json kernel_res;
         std::vector<std::string> matches;
-        std::size_t word_offset = fift_.code_complete(code, cursor_pos, matches);
+        std::size_t cursor_start, cursor_end;
+        std::string token = parse_token(code, cursor_pos, cursor_start, cursor_end);
 
-        if (!matches.empty()) {
+        if (fift_.code_complete(token, matches)) {
             kernel_res["matches"] = matches;
-            kernel_res["cursor_start"] = word_offset;
+            kernel_res["cursor_start"] = cursor_start;
+            kernel_res["cursor_end"] = cursor_end;
         } else {
             kernel_res["matches"] = {};
             kernel_res["cursor_start"] = cursor_pos;
+            kernel_res["cursor_end"] = cursor_pos;
         }
 
         kernel_res["status"] = "ok";
-        kernel_res["cursor_end"] = cursor_pos;
         return kernel_res;
     }
 
@@ -62,8 +89,10 @@ namespace xfift
                                                int detail_level)
     {
         nl::json kernel_res;
-        std::string docstring = fift_.code_inspect(code, cursor_pos);
-       
+        std::size_t cursor_start, cursor_end;
+        std::string token = parse_token(code, cursor_pos, cursor_start, cursor_end);
+        std::string docstring = fift_.code_inspect(token);
+        
         if (!docstring.empty()) {
             kernel_res["found"] = true;
             kernel_res["data"]["text/plain"] = docstring;

@@ -6,7 +6,6 @@
 #include "xfift.hpp"
 
 using xeus::xinterpreter;
-
 namespace nl = nlohmann;
 
 namespace xfift {

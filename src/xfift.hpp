@@ -14,6 +14,7 @@ namespace xfift {
     struct XResult
     {
         int code;
+        std::string vmlog;
         std::string output;
         std::string ename;
         std::string evalue;
@@ -41,12 +42,7 @@ namespace xfift {
 
         void configure();
         XResult do_interpret(const std::string& expr);
-
-        std::size_t code_complete(const std::string& line, 
-                                  std::size_t cursor_pos, 
-                                  std::vector<std::string>& matches); 
-                                  
-        std::string code_inspect(const std::string& line, 
-                                 std::size_t cursor_pos);      
+        bool code_complete(const std::string& token, std::vector<std::string>& matches);
+        std::string code_inspect(const std::string& word);      
     };
 }

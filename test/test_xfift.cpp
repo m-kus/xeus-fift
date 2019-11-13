@@ -66,3 +66,12 @@ TEST(XFiftTest, EndLineInspect)
     std::string docstring = fift.code_inspect("four .s", 7);
     ASSERT_TRUE(docstring.size() > 50);
 }
+
+TEST(XFiftTest, EndWordInspect)
+{
+    xfift::XFift fift;
+    fift.configure();
+
+    std::string docstring = fift.code_inspect("tuple ", 5);
+    ASSERT_TRUE(docstring.size() > 50);
+}

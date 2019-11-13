@@ -19,7 +19,7 @@ def write_file(rel_path, data):
 def escape(s):
     return s.replace('\\', '\\\\') \
             .replace('"', '\\"') \
-            .replace('\n', '\\\\n')
+            .replace('\n', '\\n')
 
 
 def expand_symbols(s):
@@ -48,12 +48,25 @@ def expand_symbols(s):
         r'\'\'': '”',
         r'\\b': ' ',
         r'\s\\Sha\s': ' SHA256 ',
+        r'--': '—',
+        r'_1': '₁',
+        r'_n': 'ₙ',
+        r'_m': 'ₘ',
+        r'_0': '₀',
+        r'\^x': 'ˣ ',
+        r'\^y': 'ʸ ',
+        r'\^\{-y\}': '⁻ʸ ',
+        r'\^\{y-1\}': 'ʸ⁻¹ ',
+        r'\^z': 'ᶻ ',
+        r'1/2': '½',
         # syntax
         r'\s([\.,;:])': '\\1',
         r'~': ' ',
         r'\\/': '',
         r'\\([\$\{\}%&])': '\\1',
         r'\s+': ' ',
+        # adapt for jupyter notebook
+        r'(^[^—]+\([^\)]+\)),\s([A-z])': lambda m: m.group(1) + '\n' + m.group(2).upper()
     }
     for pattern, symbol in symbols.items():
         s = re.sub(pattern, symbol, s)

@@ -25,6 +25,8 @@ namespace xfift {
                 tb << " (" << str::strip(msg[1]) << ")";
             }
             evalue = str::strip(msg[4]);
+
+            traceback.push_back(ename + ": " + evalue);
             traceback.push_back(tb.str());
             if (msg.size() == 6) {
                 traceback.push_back("Due to underlying error: " + msg[5]);
@@ -39,6 +41,7 @@ namespace xfift {
         , ename("Abnormal termination")
         , evalue("code `" + std::to_string(e.res) + "`")
     {
+        traceback.push_back(ename + ": " + evalue);
     }
 
     XFift::XFift()
@@ -60,6 +63,8 @@ namespace xfift {
 
     void XFift::configure()
     {
+        SET_VERBOSITY_LEVEL(verbosity_DEBUG);
+
         std::vector<std::string> source_include_path;
         const char* path = std::getenv("FIFTPATH");
         str::split(path ? path : "/usr/lib/fift", ':', source_include_path);
@@ -93,59 +98,34 @@ namespace xfift {
 
         try {
             res.code = fift::funny_interpret_loop(ctx_);
-            res.output = str::strip(ssout.str());
         } catch (fift::IntError ab) {
             res = XResult(ab);
-            res.traceback.push_back(sserr.str());
         } catch (fift::Quit q) {
             res = XResult(q);
-            res.traceback.push_back(sserr.str());
         }
-        
+
+        res.output = str::strip(ssout.str());
+        res.vmlog = sserr.str();        
         return std::move(res);
     }
 
-    std::size_t XFift::code_complete(const std::string& line, 
-                                     std::size_t cursor_pos, 
-                                     std::vector<std::string>& matches)
+    bool XFift::code_complete(const std::string& token, std::vector<std::string>& matches)
     {
-        std::size_t word_offset = 0;
-        bool maybe_include = false;
-
-        std::size_t delim_pos = line.find_last_of(" \"", cursor_pos);
-        if (delim_pos != std::string::npos) {
-            word_offset = std::min(delim_pos + 1, cursor_pos);
-            maybe_include = line[delim_pos] == '"';
-        }
-             
-        std::string prefix = line.substr(word_offset, cursor_pos - word_offset);   
-        if (maybe_include) {
+        if (!token.empty() && token[0] == '"') {
             // TODO
         } else {
             std::for_each(dictionary_.begin(), dictionary_.end(), [&](const std::pair<std::string, WordRef>& x) {
-                if (prefix.empty() || std::equal(prefix.begin(), prefix.end(), x.first.begin())) {
+                if (token.empty() || std::equal(token.begin(), token.end(), x.first.begin())) {
                     matches.push_back(str::strip(x.first));
                 }
             });
         }
 
-        return word_offset; 
+        return !matches.empty(); 
     }
 
-    std::string XFift::code_inspect(const std::string& line, std::size_t cursor_pos) 
+    std::string XFift::code_inspect(const std::string& word) 
     {
-        std::size_t pred_pos = line.find_last_of(' ', cursor_pos);
-        std::size_t succ_pos = line.find_first_of(' ', cursor_pos);
-        if (pred_pos == std::string::npos) {
-            pred_pos = 0;
-        } else {
-            pred_pos++;
-        }
-        if (succ_pos == std::string::npos) {
-            succ_pos = line.size();
-        }
-
-        std::string word = line.substr(pred_pos, succ_pos - pred_pos);
         return get_docstring(word);
     }
 }
