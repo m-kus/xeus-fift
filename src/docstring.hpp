@@ -811,6 +811,13 @@ namespace xfift {
             {"DEBUGON", "FE1F — DEBUGON, enables debug output (in a debug version of TVM)."},
             {"LOGFLUSH", "FEF000 — LOGFLUSH, flushes all pending debug output from the buffer into the debug log."},
             {"SETCPX", "FFF0 — SETCPX ( c — )\nSelects codepage c with -2^{15}≤ c<2^{15} passed in the top of the stack."},
+            {"c0", "c0 — Contains the next continuation or return continuation (similar to the subroutine return address in conventional designs). This value must be a Continuation."},
+            {"c1", "c1 — Contains the alternative (return) continuation; this value must be a Continuation. It is used in some (experimental) control flow primitives, allowing TVM to define and call “subroutines with two exit points”."},
+            {"c2", "c2 — Contains the exception handler. This value is a Continuation, invoked whenever an exception is triggered."},
+            {"c3", "c3 — Contains the current dictionary, essentially a hashmap containing the code of all functions used in the program. For reasons explained later in p:func.rec.dict, this value is also a Continuation, not a Cell as one might expect."},
+            {"c4", "c4 — Contains the root of persistent data, or simply the data. This value is a Cell. When the code of a smart contract is invoked, c4 points to the root cell of its persistent data kept in the blockchain state. If the smart contract needs to modify this data, it changes c4 before returning."},
+            {"c5", "c5 — Contains the output actions. It is also a Cell initialized by a reference to an empty cell, but its final value is considered one of the smart contract outputs. For instance, the SENDMSG primitive, specific for the TON Blockchain, simply inserts the message into a list stored in the output actions."},
+            {"c7", "c7 — Contains the root of temporary data. It is a Tuple, initialized by a reference to an empty Tuple before invoking the smart contract and discarded after its termination. In the TON Blockchain context,c7is initialized with a singletonTuple, the only component of which is aTuplecontaining blockchain-specific data. The smart contract is free to modifyc7to store its temporary data provided the first component of thisTupleremains intact."},
         };
         
         if (!word.empty()) {

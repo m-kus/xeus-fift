@@ -24,10 +24,6 @@ def escape(s):
 
 def expand_symbols(s):
     symbols = {
-        # commands
-        r'\\textit\{([^\}]+)\}': '\\1',
-        r'\\texttt\{([^\}]+)\}': '\\1',
-        r'\{\\tt\s([^\}]+)\}': '\\1',
         # symbols
         r'\\lfloor\s?': ' ⌊',
         r'\s?\\rfloor': '⌋ ',
@@ -82,6 +78,10 @@ def expand_symbols(s):
         r'\\/': '',
         r'\\([\$\{\}%&])': '\\1',
         r'\s+': ' ',
+        # commands
+        r'\\textit\{([^\}]+)\}': '\\1',
+        r'\\texttt\{([^\}]+)\}': '\\1',
+        r'\{\\tt\s([^\}]+)\}': '\\1',
         # adapt for jupyter notebook
         r'(^[^\(]+\([^\)]+\)),\s([A-z])': lambda m: m.group(1) + '\n' + m.group(2).upper(),
     }
@@ -95,7 +95,7 @@ def parse_token(token):
     if isinstance(token, str):
         return token.strip()
     elif isinstance(token, TexCmd):
-        if token.name in {'tt', 'em', '/', 'ptref', 'item', 'cite', '/s', 'underline'}:
+        if token.name in {'tt', 'em', '/', 'ptref', 'item', 'cite', '/s', 'underline', 'texttt', 'footnote'}:
             return ''.join(map(parse_token, token.contents))
         elif token.name in {'lsqbr', 'rsqbr', 'dots', 'ldots'}:
             return f'\\{token.name}'
@@ -154,17 +154,27 @@ def get_asm_definitions() -> list:
     tvm_tex = read_file('third-party/ton/doc/tvm.tex')
     lines = tvm_tex.split('\n')
     lines = filter(lambda x: re.match(r'\\item \{\\tt [A-Z0-9]+\} --- \{\\tt [A-Z]+\}', x), lines)
-    items = list(map(lambda x: next(iter(TexSoup(x))), lines))
+    items = map(lambda x: next(iter(TexSoup(x))), lines)
     return list(filter(lambda x: x, map(lambda i: parse_item(i, 2), items)))
+
+
+def get_register_definitions() -> list:
+    tvm_tex = read_file('third-party/ton/doc/tvm.tex')
+    lines = tvm_tex.split('\n')
+    lines = filter(lambda x: re.match(r'\\item \\texttt\{c[0-9]\}', x), lines)
+    items = map(lambda x: next(iter(TexSoup(x))), lines)
+    definitions = map(lambda x: escape(expand_symbols(parse_token(x))), items)
+    return list(map(lambda x: dict(word=x.split()[0], definition=x), definitions))
 
 
 def generate_docs():
     word_definitions = get_word_definitions()
     asm_definitions = get_asm_definitions()
+    register_definitions = get_register_definitions()
     template = read_file('src/docstring.hpp.in')
     placeholder = next(line for line in template.split('\n') if line.endswith('item_template'))
     item_template = placeholder.rstrip('// item_template')
-    docs = '\n'.join(map(lambda x: item_template.format(**x), word_definitions + asm_definitions))
+    docs = '\n'.join(map(lambda x: item_template.format(**x), word_definitions + asm_definitions + register_definitions))
     data = template.replace(placeholder, docs)
     write_file('src/docstring.hpp', data)
 
