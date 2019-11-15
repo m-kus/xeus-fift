@@ -24,6 +24,10 @@ def escape(s):
 
 def expand_symbols(s):
     symbols = {
+        # commands
+        r'\\textit\{([^\}]+)\}': '\\1',
+        r'\\texttt\{([^\}]+)\}': '\\1',
+        r'\{\\tt\s([^\}]+)\}': '\\1',
         # symbols
         r'\\lfloor\s?': ' ⌊',
         r'\s?\\rfloor': '⌋ ',
@@ -33,10 +37,10 @@ def expand_symbols(s):
         r'\s?\\rangle': '❭',
         r'\\lsqbr': '[',
         r'\\rsqbr': ']',
-        r'\\textit\{([^\}]+)\}': '\\1',
         r'\\leq': '≤',
         r'\\geq': '≥',
         r'\\neq': '≠',
+        r'\\approx': '≈',
         r'\\oplus': '⊕',
         r'\\max': 'max',
         r'\\min': 'min',
@@ -44,10 +48,23 @@ def expand_symbols(s):
         r'\\ldots': '…',
         r'\\cdot': '⋅',
         r'\\Delta': 'Δ',
+        r'\\vee': '∨',
+        r'\\sgn': 'sgn',
+        r'\\emptyset': '∅',
+        r'\\leftarrow': '🡐',
+        r'\\rightarrow': '🡒',
+        r'\\circ': '◦',
+        r'\\caret': '^',
+        r'\\tilde c': 'ć',
         r'``': '“',
         r'\'\'': '”',
         r'\\b': ' ',
+        r'\\,': '',
+        r'igl\(': '(',
+        r'igr\)': ')',
         r'\s\\Sha\s': ' SHA256 ',
+        r'\\HashmapE': 'HashmapE',
+        r'---': '—',
         r'--': '—',
         r'_1': '₁',
         r'_n': 'ₙ',
@@ -66,7 +83,7 @@ def expand_symbols(s):
         r'\\([\$\{\}%&])': '\\1',
         r'\s+': ' ',
         # adapt for jupyter notebook
-        r'(^[^—]+\([^\)]+\)),\s([A-z])': lambda m: m.group(1) + '\n' + m.group(2).upper()
+        r'(^[^\(]+\([^\)]+\)),\s([A-z])': lambda m: m.group(1) + '\n' + m.group(2).upper(),
     }
     for pattern, symbol in symbols.items():
         s = re.sub(pattern, symbol, s)
@@ -95,8 +112,7 @@ def parse_token(token):
         assert False, token
 
 
-def parse_word(item):
-    rarg = next(iter(item.tokens))
+def parse_word(rarg):
     if not isinstance(rarg, RArg):
         return None
     
@@ -111,13 +127,17 @@ def parse_word(item):
     return ''.join(map(parse_token, res))
 
 
-def parse_item(item):
-    word = parse_word(item)
-    if word:
-        return dict(
-            word=escape(expand_symbols(word)), 
-            definition=escape(expand_symbols(parse_token(item)))
-        )
+def parse_item(item, word_offset=0):
+    tokens = list(item.tokens)
+    if len(tokens) <= word_offset:
+        return None
+    word = parse_word(tokens[word_offset])
+    if not word:
+        return None
+    return dict(
+        word=escape(expand_symbols(word)), 
+        definition=escape(expand_symbols(parse_token(item)))
+    )
 
 
 def get_word_definitions() -> list:
@@ -130,12 +150,21 @@ def get_word_definitions() -> list:
     return list(filter(lambda x: x, map(parse_item, items)))
 
 
+def get_asm_definitions() -> list:
+    tvm_tex = read_file('third-party/ton/doc/tvm.tex')
+    lines = tvm_tex.split('\n')
+    lines = filter(lambda x: re.match(r'\\item \{\\tt [A-Z0-9]+\} --- \{\\tt [A-Z]+\}', x), lines)
+    items = list(map(lambda x: next(iter(TexSoup(x))), lines))
+    return list(filter(lambda x: x, map(lambda i: parse_item(i, 2), items)))
+
+
 def generate_docs():
     word_definitions = get_word_definitions()
+    asm_definitions = get_asm_definitions()
     template = read_file('src/docstring.hpp.in')
     placeholder = next(line for line in template.split('\n') if line.endswith('item_template'))
     item_template = placeholder.rstrip('// item_template')
-    docs = '\n'.join(map(lambda x: item_template.format(**x), word_definitions))
+    docs = '\n'.join(map(lambda x: item_template.format(**x), word_definitions + asm_definitions))
     data = template.replace(placeholder, docs)
     write_file('src/docstring.hpp', data)
 
