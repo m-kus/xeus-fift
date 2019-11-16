@@ -10,9 +10,9 @@ namespace xfift
     nl::json make_pub_data(XResult res) {
         std::stringstream ss;
         if (!res.vmlog.empty()) {
-            ss << "<pre style=\"background-color: #ffe7d1; padding: 10px; margin-top: 5px;\">" << res.vmlog << "</pre>";
+            ss << "<pre style=\"background-color: #ffe7d1; padding: 10px;\">" << res.vmlog << "</pre>";
         }
-        ss << "<pre style=\"padding: 3px;\">" << res.output << "</pre>";
+        ss << "<pre>" << res.output << "</pre>";
 
         nl::json data;
         data["text/html"] = ss.str();

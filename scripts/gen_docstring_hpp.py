@@ -1,5 +1,6 @@
 import requests
 import re
+from collections import defaultdict
 from os.path import dirname, join
 from TexSoup import TexSoup, TexCmd, TexEnv, TexNode, RArg
 
@@ -91,9 +92,13 @@ def expand_symbols(s):
     return s.strip()
 
 
+def non_space(x):
+    return x != ' '
+
+
 def parse_token(token):
     if isinstance(token, str):
-        return token.strip()
+        return token
     elif isinstance(token, TexCmd):
         if token.name in {'tt', 'em', '/', 'ptref', 'item', 'cite', '/s', 'underline', 'texttt', 'footnote'}:
             return ''.join(map(parse_token, token.contents))
@@ -101,13 +106,13 @@ def parse_token(token):
             return f'\\{token.name}'
         else:
             assert len(list(token.contents)) == 0, token
-            return token.name.strip()
+            return token.name
     elif isinstance(token, RArg):
         return ''.join(map(parse_token, token.contents))
     elif isinstance(token, TexEnv):
         return ''.join(map(parse_token, token.contents))
     elif isinstance(token, TexNode):
-        return ' '.join(map(parse_token, token.tokens))
+        return ' '.join(filter(non_space, map(parse_token, token.tokens)))
     else:
         assert False, token
 
@@ -118,44 +123,67 @@ def parse_word(rarg):
     
     contents = list(rarg.contents)
     assert isinstance(contents[0], TexCmd) and contents[0].name == 'tt'
+
+    i = next(i + 1 for i, c in enumerate(contents[1:]) if c != ' ')
     
-    if isinstance(contents[1], TexCmd) and contents[1].name == 'underline':
-        res = contents[1].tokens
+    if isinstance(contents[i], TexCmd) and contents[i].name == 'underline':
+        res = contents[i].tokens
     else:
-        res = contents[1:]
+        assert 'underline' not in str(rarg), rarg
+        res = contents[i:]
     
     return ''.join(map(parse_token, res))
-
-
-def parse_item(item, word_offset=0):
-    tokens = list(item.tokens)
-    if len(tokens) <= word_offset:
-        return None
-    word = parse_word(tokens[word_offset])
-    if not word:
-        return None
-    return dict(
-        word=escape(expand_symbols(word)), 
-        definition=escape(expand_symbols(parse_token(item)))
-    )
 
 
 def get_word_definitions() -> list:
     fiftbase_tex = read_file('third-party/ton/doc/fiftbase.tex') 
     sections = re.split(r'\\clearpage', fiftbase_tex)
     assert sections[-1].startswith('\n\\appendix\\myappendix'), "Cannot locate Appendix"
+    
     appendix = '\\begin{document}' + sections[-1].replace('[', '\\lsqbr ').replace(']', '\\rsqbr ')
     soup = TexSoup(appendix)
     items = soup.find_all('item')
-    return list(filter(lambda x: x, map(parse_item, items)))
+    
+    definitions = []
+    for item in items:
+        word = parse_word(next(iter(item.tokens)))
+        if not word:
+            continue
+        
+        definitions.append(dict(
+            word=escape(expand_symbols(word)), 
+            definition=escape(expand_symbols(parse_token(item)))
+        ))
+
+    return definitions
+
+
+def parse_instr(line):
+    main = re.findall(r'--- \{\\tt ([A-Z0-9-]+)', line)
+    alt = re.findall(r'\} or \{\\tt ([A-Z0-9-]{2,})', line)
+    aka = re.findall(r'also known as \{\\tt ([A-Z0-9-]+)', line)
+    return main + alt + aka
 
 
 def get_asm_definitions() -> list:
     tvm_tex = read_file('third-party/ton/doc/tvm.tex')
     lines = tvm_tex.split('\n')
-    lines = filter(lambda x: re.match(r'\\item \{\\tt [A-Z0-9]+\} --- \{\\tt [A-Z]+\}', x), lines)
-    items = map(lambda x: next(iter(TexSoup(x))), lines)
-    return list(filter(lambda x: x, map(lambda i: parse_item(i, 2), items)))
+    lines = filter(lambda x: re.match(r'\\item \{\\tt [A-Z0-9_a-z\\\$]+\} --- \{\\tt', x), lines)
+    
+    definitions = defaultdict(list)
+    for line in lines:
+        item = next(iter(TexSoup(line)))
+        definition = escape(expand_symbols(parse_token(item)))
+        for instr in parse_instr(line):
+            definitions[instr].append(definition)
+
+    def make_res(x):
+        return dict(
+            word=x[0], 
+            definition=escape('\n'.join(x[1]))
+        )
+
+    return list(map(make_res, definitions.items()))
 
 
 def get_register_definitions() -> list:
