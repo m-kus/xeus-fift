@@ -91,7 +91,7 @@ namespace xfift
             kernel_res["cursor_start"] = cursor_start;
             kernel_res["cursor_end"] = cursor_end;
         } else {
-            kernel_res["matches"] = {};
+            kernel_res["matches"] = nl::json::array();
             kernel_res["cursor_start"] = cursor_pos;
             kernel_res["cursor_end"] = cursor_pos;
         }

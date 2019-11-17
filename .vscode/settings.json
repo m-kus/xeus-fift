@@ -72,7 +72,9 @@
         "valarray": "cpp",
         "variant": "cpp",
         "locale": "cpp",
-        "*.in": "cpp",
+        "*.js.in": "javascript",
+        "*.hpp.in": "cpp",
+        "*.json.in": "json",
         "*.def": "cpp",
         "fft": "cpp"
     }
