@@ -1026,6 +1026,22 @@ namespace xfift {
             {"c4", "c4 — Contains the root of persistent data, or simply the data. This value is a Cell. When the code of a smart contract is invoked, c4 points to the root cell of its persistent data kept in the blockchain state. If the smart contract needs to modify this data, it changes c4 before returning."},
             {"c5", "c5 — Contains the output actions. It is also a Cell initialized by a reference to an empty cell, but its final value is considered one of the smart contract outputs. For instance, the SENDMSG primitive, specific for the TON Blockchain, simply inserts the message into a list stored in the output actions."},
             {"c7", "c7 — Contains the root of temporary data. It is a Tuple, initialized by a reference to an empty Tuple before invoking the smart contract and discarded after its termination. In the TON Blockchain context, c7 is initialized with a singleton Tuple, the only component of which is a Tuple containing blockchain-specific data. The smart contract is free to modify c7 to store its temporary data provided the first component of this Tuple remains intact."},
+            {"s0", "Top-of-stack register"},
+            {"s1", "Stack register #1"},
+            {"s2", "Stack register #2"},
+            {"s3", "Stack register #3"},
+            {"s4", "Stack register #4"},
+            {"s5", "Stack register #5"},
+            {"s6", "Stack register #6"},
+            {"s7", "Stack register #7"},
+            {"s8", "Stack register #8"},
+            {"s9", "Stack register #9"},
+            {"s10", "Stack register #10"},
+            {"s11", "Stack register #11"},
+            {"s12", "Stack register #12"},
+            {"s13", "Stack register #13"},
+            {"s14", "Stack register #14"},
+            {"s15", "Stack register #15"},
         };
         
         if (!word.empty()) {

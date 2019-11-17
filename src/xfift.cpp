@@ -85,6 +85,10 @@ namespace xfift {
         fift::init_words_common(dictionary_);
         fift::init_words_vm(dictionary_);
         fift::init_words_ton(dictionary_);
+
+        do_interpret("\"Fift.fif\" include");
+        do_interpret("\"Asm.fif\" include");
+
         std::clog << "Configuration successful\n";
     }
 

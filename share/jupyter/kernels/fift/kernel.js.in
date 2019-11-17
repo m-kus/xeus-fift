@@ -10,36 +10,36 @@ define([
             start: [
                 // strings
                 { regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string" },
+                // bytes
+                { regex: /(?<=\s|^)B\{[A-z0-9_]+\}(?=\s|$)/, token: "string" },
                 // slices
                 { regex: /(?<=\s|^)x\{[A-z0-9_]+\}(?=\s|$)/, token: "string-2" },
                 { regex: /(?<=\s|^)b\{[01]+\}(?=\s|$)/, token: "string-2" },
-                // bytes
-                { regex: /(?<=\s|^)B\{[A-z0-9_]+\}(?=\s|$)/, token: "string-3" },
                 // comments
                 { regex: /\/\/.*/, token: "comment" },
                 { regex: /\/\*/, token: "comment", next: "comment" },
                 // registers c0-7, s0-15
-                { regex: /(?<=\s|^)(?:c[0-7])|(?:s[0-9]{1,3})(?=\s|$)/, token: "atom" },
+                { regex: /(?<=\s|^)(?:c[0-7])|(?:s[0-9]{1,3})(?=\s|$)/, token: "meta" },
                 // asm constants: main, recv_internal, recv_external and booleans
-                { regex: /(?<=\s|^)(?:main|recv_internal|recv_external|true|false)(?=\s|$)/, token: "atom" },
+                { regex: /(?<=\s|^)(?:main|recv_internal|recv_external|true|false)(?=\s|$)/, token: "meta" },
                 // numbers
                 { regex: /(?<=\s|^)(?:(?:[+-]?[0-9]+\.?[0-9]*)|(?:0x[0-9a-f]+)|(?:0b[01]+))(?=\s|$)/i, token: "number" },
                 // builder <b ... b> and cell <s ... s> (multiline)
-                { regex: /(?<=\s|^)\<[bs](?=\s|$)/, token: "def", indent: true },
-                { regex: /(?<=\s|^)[bs]\>(?=\s|$)/, token: "def", dedent: true },
+                { regex: /(?<=\s|^)\<[bs](?=\s|$)/, token: "atom", indent: true },
+                { regex: /(?<=\s|^)[bs]\>(?=\s|$)/, token: "atom", dedent: true },
                 // asm code <{ ... }>s/c and control instructions PROC, CONT, REPEAT, IF, ELSE, etc (multiline)
-                { regex: /(?<=\s|^)[A-Z:]*<\{(?=\s|$)/, token: "def", indent: true },
-                { regex: /(?<=\s|^)(?:\}(?:END)?>[A-Zsc:]?)(?=\s|$)/, token: "def", dedent: true },
-                { regex: /(?<=\s|^)(?:\}>[A-Z]+<\{)(?=\s|$)/, token: "def" },
+                { regex: /(?<=\s|^)[A-Z:]*<\{(?=\s|$)/, token: "builtin", indent: true },
+                { regex: /(?<=\s|^)(?:\}(?:END)?>[A-Zsc:]?)(?=\s|$)/, token: "bultin", dedent: true },
+                { regex: /(?<=\s|^)(?:\}>[A-Z]+<\{)(?=\s|$)/, token: "builtin" },
                 // word lists { ... } (multiline)
-                { regex: /(?<=\s|^)\{(?=\s|$)/, token: "def", indent: true },
-                { regex: /(?<=\s|^)\}(?=\s|$)/, token: "def", dedent: true },
-                // other definitions
-                { regex: /(?<=\s|^)(?:2?constant|variable|create|\(create\)|2?=:|:_?|::_?)(?=\s|$)/, token: "def" },
+                { regex: /(?<=\s|^)\{(?=\s|$)/, token: "variable-2", indent: true },
+                { regex: /(?<=\s|^)\}(?=\s|$)/, token: "variable-2", dedent: true },
+                // definitions
+                { regex: /(?<=\s|^)(?:2?constant|variable|2?=:|:_?|::_?)(?=\s|$)/, token: "keyword", next: "def" },
                 // words
                 { regex: /(?<=\s|^)(?:abort)(?=\")/, token: "keyword" },
                 { regex: builtin_words, token: "keyword"},
-                { regex: fift_words, token: "keyword"},
+                { regex: fift_words, token: "variable"},
                 { regex: asm_words, token: "operator"},
                 // fallback
                 { regex: /[^\s]+/, token: "variable"},
@@ -47,6 +47,9 @@ define([
             comment: [
                 { regex: /.*?\*\//, token: "comment", next: "start" },
                 { regex: /.*/, token: "comment" }
+            ],
+            def: [
+                { regex: /.*$/, token: "def", next: "start" },
             ],
             // The meta property contains global information about the mode. It
             // can contain properties like lineComment, which are supported by
