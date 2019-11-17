@@ -1,10 +1,15 @@
-import requests
 import re
 from collections import defaultdict
 from os.path import dirname, join
 from TexSoup import TexSoup, TexCmd, TexEnv, TexNode, RArg
 
 project_dir = dirname(dirname(__file__))
+
+extra = [
+    ('s0', 'Top-of-stack register'),
+    *list(map(lambda x: (f's{x}', f'Stack register #{x}'), range(1, 16))),
+]
+extra_definitions = list(map(lambda x: dict(word=x[0], definition=x[1]), extra))
 
 
 def read_file(rel_path):
@@ -92,10 +97,6 @@ def expand_symbols(s):
     return s.strip()
 
 
-def non_space(x):
-    return x != ' '
-
-
 def parse_token(token):
     if isinstance(token, str):
         return token
@@ -112,7 +113,7 @@ def parse_token(token):
     elif isinstance(token, TexEnv):
         return ''.join(map(parse_token, token.contents))
     elif isinstance(token, TexNode):
-        return ' '.join(filter(non_space, map(parse_token, token.tokens)))
+        return ' '.join(filter(lambda x: x, map(parse_token, token.tokens)))
     else:
         assert False, token
 
@@ -174,6 +175,7 @@ def get_asm_definitions() -> list:
     for line in lines:
         item = next(iter(TexSoup(line)))
         definition = escape(expand_symbols(parse_token(item)))
+        definition = re.sub(r'^([A-Z0-9_a-z\\\$]+)', 'x{\\1}', definition)
         for instr in parse_instr(line):
             definitions[instr].append(definition)
 
@@ -195,10 +197,10 @@ def get_register_definitions() -> list:
     return list(map(lambda x: dict(word=x.split()[0], definition=x), definitions))
 
 
-def generate_docs():
+def gen_docstring_hpp():
     word_definitions = get_word_definitions()
     asm_definitions = get_asm_definitions()
-    register_definitions = get_register_definitions()
+    register_definitions = get_register_definitions() + extra_definitions
     template = read_file('src/docstring.hpp.in')
     placeholder = next(line for line in template.split('\n') if line.endswith('item_template'))
     item_template = placeholder.rstrip('// item_template')
@@ -208,4 +210,4 @@ def generate_docs():
 
 
 if __name__ == '__main__':
-    generate_docs()
+    gen_docstring_hpp()

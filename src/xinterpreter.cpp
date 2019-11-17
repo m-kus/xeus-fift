@@ -7,12 +7,28 @@ namespace xfift
         fift_.configure();
     }
 
+    std::string html_escape(const std::string& data) {
+        std::string buffer;
+        buffer.reserve(data.size());
+        for(size_t pos = 0; pos != data.size(); ++pos) {
+            switch(data[pos]) {
+                case '&':  buffer.append("&amp;");       break;
+                case '\"': buffer.append("&quot;");      break;
+                case '\'': buffer.append("&apos;");      break;
+                case '<':  buffer.append("&lt;");        break;
+                case '>':  buffer.append("&gt;");        break;
+                default:   buffer.append(&data[pos], 1); break;
+            }
+        }
+        return std::move(buffer);
+    }
+
     nl::json make_pub_data(XResult res) {
         std::stringstream ss;
         if (!res.vmlog.empty()) {
-            ss << "<pre style=\"background-color: #ffe7d1; padding: 10px;\">" << res.vmlog << "</pre>";
+            ss << "<pre style=\"background-color: #ffe7d1; padding: 10px;\">" << html_escape(res.vmlog) << "</pre>";
         }
-        ss << "<pre>" << res.output << "</pre>";
+        ss << "<pre>" << html_escape(res.output) << "</pre>";
 
         nl::json data;
         data["text/html"] = ss.str();
@@ -120,7 +136,7 @@ namespace xfift
         kernel_res["language_info"]["name"] = "fift";
         kernel_res["language_info"]["version"] = "0.5";
         kernel_res["language_info"]["mimetype"] = "text/x-fift";
-        kernel_res["language_info"]["codemirror_mode"] = "text/x-fift";
+        kernel_res["language_info"]["codemirror_mode"] = "fift";
         kernel_res["language_info"]["file_extension"] = ".fif";
         return kernel_res;
     }

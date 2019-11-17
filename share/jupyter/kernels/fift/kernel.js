@@ -1,52 +1,67 @@
-define(function(){
-
-    var onload = function(){
+define([
+    'codemirror/lib/codemirror', 
+    'codemirror/addon/mode/simple'
+], function(CodeMirror) {
+    var builtin_words = /(?<=\s|^)(?:ed25519_sign|B>Lu@|vmlibs|cond|roll|\._|untuple|dictdiff|filepart>B|words|string\?|\(b\.\)|2drop|0<=|\|_|0<|ref@|rmod|execute|remaining|b>|0|dup|\||\(forget\)|\[|halt|tpop|\[\]|create|B@\?|\$Len|priv>pub|\*mod|space|i,|exch2|\}|x\._|box|over|s>|\(create\)|X\._|udict!\+|bbitrefs|B\||eq\?|dbrunvm\-parallel|udict@|brembitrefs|\$len|u@|swap|@|dict>s|B@|hash|runvmctx|\$>s|fits|\-1<<|\(\-trailing\)|reverse|u@\?\+|dbrunvm|b\._|\/cmod|i@\?\+|\?dup|gasrunvmcode|Li>B|\*\/|\.tc|BhashB|smca>\$|newkeypair|\$,|\*\/c|,|s,|2dup|\(dump\)|B>file|x>B\?|\(X\.\)|'nop|dict,|B=|B>Li@\+|dictmerge|::|nop|or|dictforeach|B@\+|allot|\/rmod|x\.|>>c|\*\/mod|<<|2\*|\-trailing|\(hex\-number\)|dictnew|cmod|explode|\$>B|x>B|include|rot|B>X|<<\/r|\-roll|gasrunvmdict|sbits|bl|tuple\?|bye|quit|\(atom\)|\(x\.\)|atom>\$|\.dump|anon|b>udict!|B@\?\+|word|type|i>B|ref@\?|file>B|\*\/rmod|box\?|tuck|b>udict!\+|pick|idict!|\*>>r|integer\?|getenv\?|\.s|pfxdict!\+|2\/|gasrunvm|>|\[\]=|2\+|!|ed25519_sign_uint|b\+|B>u@|:_|mod|\.l|0<>|crc32c|boc\+>B|\.|\(\.\)|ref@\?\+|0>=|udict!|i@\+|\]|\/c|B>base64|gasrunvmctx|srefs|cr|b\{|null|B>base64url|base64>B|chr|=|ufits|b>spec|getenv|find|1<<1\-|bbits|ref@\+|1\-|<b|<=|\*>>c|x\{|\$reverse|dict@|crc32|brembits|char|skip\-to\-eof|B>i@\+|i@\?|ifnot|pfxdict@|2over|B,|file\-exists\?|\+|crc16|\$>smca|>>r|idict@|>=|\(execute\)|eqv\?|B>u@\+|b>idict!\+|forget|Lu>B|\(\{\)|\$=|<xchg>|u>B|pfxdict!|Blen|negate|\(number\)|B>x|\$@\?\+|<s|false|\"|\/|\*\/r|not|\$@|ref,|\(word\)|i@|\-trailing0|hashu|\*\/cmod|idict!\+|\/r|dictmap|xor|hashB|and|atom\?|empty\?|emit|B>\$|%1<<|2swap|dict@\+|\$Split|\{|\$@\?|sgn|csr\.|tuple|1<<|drop|sr,|:|\-1|u,|boc>B|Bx\.|runvm|count|base64url>B|depth|2|2\-|true|\*>>|Bcmp|\/mod|now|b>idict!|runvmdict|<<\/c|sbitrefs|::_|\$\||\(char\)|1\+|>>|skipspc|\-|if|Bhashu|B>boc|hole|\$@\+|\(\}\)|\(compile\)|\$\+|until|\-rot|'|<>|ed25519_chksign|\$cmp|<|times|B>i@|B\+|\|\+|0>|u@\?|B>Lu@\+|<<\/|1|X\.|while|0=|\*|bremrefs|u@\+|hold|<push>|exch|b\.|nip|runvmcode|Bhash|cmp|\.sl|<pop>|brefs|dictmapext|abort|null\?|B>Li@)(?=\s|$)/;
+    var fift_words = /(?<=\s|^)(?:s>c|binary|\+\"|\#>|\$\(|shash|library|b\#s|\[compile\]|cadr|sign|0x\._|recursive|\#s|unpair|constant|\+!|pair|max|single\?|cddr|\(0X\.\)|first|does|def\?|abort\"|\('\)|0x\.|car|\/\/|single|abs|second|\.\"|x\#|X\#|tuple\-len\?|B\#s|\/\*|s\-fits\?|untriple|1\+!|variable|=:|base|X\#s|1\-!|cons|decimal|x\#s|<\#|skip\-ifdef|hex|0!|\#|triple|caddr|Digit|min|library\-version|unsingle|\(0x\.\)|Base\#s|`|base\#|digit|B\#|atom|triple\?|\-!|nil|2=:|octal|third|Base\#|cdr|B\{|uncons|2constant|minmax|null!|nil\?|ten|0X\._|base\#s|@'|\[forget\]|list|\(def\?\)|pair\?|b\#|undef\?|0X\.)(?=\s|$)/;
+    var asm_words = /(?<=\s|^)(?:LDULE8Q|DUMPSTK|DICTIGETNEXTEQ|SDSKIPLAST|TRUE|STUR|THROWARGANY|SGN|DIVR|SDPPFX|DICTIREPLACEB|@\-range|@procdictkeylen|DICTUADDB|\}END>|IFJMP:<\{|REVX|AGAIN:<\{|2DROP|GEQINT|IFNBITJMP|SSKIPFIRST|DIVC|CARQ|THROWARGANYIF|DICTUGETPREVEQ|DICTUGETEXEC|STIX|LDMSGADDR|EXECUTE|IFJMPREF|CADDR|PUSHCONT|LESS|CHKBOOL|XCPU2|@Defop|GETGLOB|STREFRQ|CONT:<\{|DICTSETREF|SDPSFXREV|ISPOS|DICTSETB|DEC|c5|DICTIADDGETREF|DIVMODC|QINC|SDPFXREV|CDDR|LDDICTQ|UNTILEND|WHILE:<\{|QLSHIFT|LDULE4|LSHIFT|STONE|STBREF|DICTUMAX|NIP|LDI|LDSLICEXQ|ONLYX|s8|\}>ATEXITALT|\}>IFNOT|DICTIMAX|LDSLICEX|REVERSE|PLDREF|STIXR|IFJMP|IF:<\{|SUBR|COMMA|DICTUGETJMP|INDEXQ|BALANCE|DICTGETOPTREF|STRPRINT|DICTIREMMAX|PLDILE4|QMULDIVR|NEWC|IFRET|LDOPTREF|@Defop\(ref\)|PU2XC|LDVARINT16|SDBEGINS|SCHKREFS|QDIVR|QAND|s\(\-1\)|PROCREF|THROWANYIF|PROGRAM\{|DICTADDGETREF|CDRQ|ATEXITALT:<\{|QRSHIFT|SETCONTCTRX|DICTUDELGET|PLDDICT|PUSHREFSLICE|WHILE|>libref|PUSHINT|GETPARAM|CHKSIGNU|DICTPUSHCONST|DICTIREPLACEGETREF|MULRSHIFTR\#|RETARGS|ISNEG|QOR|DICTADDGET|@chkdict|PROC|STI_l|DIVMOD|DICTIREMMINREF|HASHSU|XCHGX|@Defop\(s\)|s15|SUBDICTGET|PLDREFVAR|recv_external|PLDULE4Q|LSHIFT\#DIV|INDEX3|QMOD|DICTIGETREF|PAIR|PLDREFIDX|SBITS|DICTUGETREF|SETSECONDQ|LTIME|JMPXARGS|BLKSWAP|DICTREPLACEGETREF|DEBUG|RETURNARGS|STSLICEQ|SETALTCTR|CDR|THIRDQ|@Defop\(s,s\)|DICTUREMMAXREF|@havebits|DICTMIN|STREF_l|REWRITEVARADDRQ|IF|XCHG2|PLDSLICEX|PFXDICTCONSTGETJMP|DICTREMMIN|INDEXVARQ|s4|SDCNTTRAIL1|STBRQ|LESSINT|IFNOT:|2DUP|DROPX|SDPPFXREV|BCONCATQ|c3|LOGSTR|s5|PUXC2|PLDULE8Q|DICTADDB|PARSEMSGADDR|DICTUSET|DICTUMIN|DIVMODR|SCUTLAST|SETCP0|\}>AGAIN|DICTEMPTY|SDCNTLEAD0|QNOT|PFXDICTGETJMP|PUXC|\}END>c|XCHG3_l|UNSINGLE|FALSE|AGAIN:|UNPACKFIRSTVAR|STGRAMS|THROW|DICTSETGET|PLDI|\}>IF|ADD|ROLLREV|QDIV|CONFIGPARAM|BREMREFS|UNTUPLEVAR|EXPLODEVAR|BOOLAND|AND|DICTREPLACEGET|s2|DICTUADDGETREF|PUSHROOT|ENDCST|@\||SETGLOBVAR|CHKBIT|INT|CALLCCARGS|PFXDICTSWITCH|ADDINT|SETCODE|PFXDICTGETEXEC|DICTUREPLACEGET|RSHIFTR|POPCTRX|SETCP|THROWARGANYIFNOT|DICTGETPREV|DICTIMAXREF|STIRQ|STDICT|CONDSELCHK|RSHIFT|COMPOSALT|ISNAN|SCUTFIRST|LDSAME|UNCONS|PUSH3|DICTGETPREVEQ|THROWIFNOT|s3|STRDUMP|BBITS|@proclistadd|PLDOPTREF|SUBCONST|PLDSLICEQ|2x<=|@def\-proc|SETSECOND|SETGLOB|TVM_Asm|PROCREF:<\{|@PROC:<\{|@ensurebits|DICTISETREF|split_install|@adj\-long\-proc|SDEQ|INLINE|s6|2OVER|BLKSWX|SDBEGINSX|SUBINT|BLESSARGS|STVARUINT16|ATEXITALT|DICTUSETREF|THROWARG|ISNULL|MUL|STURQ|SETINDEXVAR|NEQ|XCHG0|\}>REPEAT|@procdict|DICTMAX|SETINDEX|@Defop\(8i\)|DICTDEL|@declproc|\}>s|NULLSWAPIFNOT|TUPLEVAR|MULRSHIFTR|@simpleuop|LDMSGADDRQ|COMPOSBOTH|STUX|PUSHCTR|QNEGATE|ENDS|LDU_l|EXPLODE|CALLCC|IFNBITJMPREF|ROLLREVX|QDIVMOD|SETFIRSTQ|PREPAREVAR|DICTIGETPREV|DICTUADD|COMPOS|DUMP|s12|REPEAT:<\{|DICTGETREF|DICTIADDGETB|\}>c|DICTREPLACEB|DICTREMMAX|@Defop\(4u,4u\)|BLESS|DICTUSETGETOPTREF|STSLICECONST|MODPOW2\#|SLICE|\}>DO<\{|RAWRESERVEX|STULE8|CALLREF|BLESSVARARGS|IFNOTREF|PRINT|RAWRESERVE|THENRET|RETURNVARARGS|LSHIFTDIV|BREFS|QUFITS|STILE8|GETGLOBVAR|UNTIL:<\{|EQINT|CAR|@endblk|LDULE8|UFITSX|MULINT|LDGRAMS|OR|TPUSH|CMP|BCHKBITS|FIRSTQ|@rangechk|SCHKREFSQ|DICTUGETOPTREF|ISTUPLE|@Defop\(8u\)|PUSHREFCONT|IFREF|BINDUMP|\}>SETEXITALT|STU|TWO|BLKDROP|INTSORT2|DEBUGSTRI|SAVEALT|SETINDEXQ|DEBUGOFF|TUCK|REWRITEVARADDR|DICTIADDGET|DICTGETNEXTEQ|LDZEROES|@Defop\(8i,alt\)|STUXQ|SECONDQ|NULLSWAPIF|STREF|STREFCONST|DICTUREPLACEGETREF|LDILE8Q|SDSFXREV|\}>CATCH<\{|LDDICT|DICTUREMMIN|ABS|NEGATE|ISNNEG|@Sreg|DICTUADDGET|SDCUTFIRST|PUSHREF|SDCNTTRAIL0|STI|NULL|SDSKIPFIRST|BCHKBITREFSQ|@Creg|ZERO|MULRSHIFT|DICTUADDREF|XCPU|DEBUGON|CHKTUPLE|PUSHNAN|STBREFR|THROWARGIF|IFNOT:<\{|PLDULE4|DICTISETB|DICTIREPLACE|DICTIADDB|JMPXVARARGS|CALLCCVARARGS|STSLICE_l|SETCONT|XCHG|PFXDICTGET|RETDATA|PLDILE8|XOR|\}>IFJMP|SETCONTCTR|CONFIGROOT|MINMAX|SETNUMARGS|QFITS|NOT|QSUBR|SDBEGINS:imm|INDEX|DICTUSETGETB|DICTREMMINREF|s7|SDBEGINSQ:imm|STREFR|DICTUADDGETB|PLDSLICE|ISNPOS|DICTIGETJMP|IFNOTRETALT|ROT2|DICTIGETEXEC|recv_internal|FITSX|WHILEEND|@newproc|STBR|PFXDICTGETQ|PUSHPOW2DEC|STDICTS|SCHKBITSQ|@doifnotelse|@trycatch|REWRITESTDADDR|hash>libref|DICTADD|PUSH|SETCONTVARARGS|c4|@addop|DICTIREMMAXREF|SDLEXCMP|\}>ELSE<\{|RETALT|STSAME|CALL|IFNOT|BCHKREFS|DICTIREPLACEREF|DICTIMINREF|TEN|RETBOOL|TLEN|CONDSEL|PARSEMSGADDRQ|IFRETALT|OVER|IFNOTJMP|DICTIDEL|\}>IFNOTJMP|LDIX|TRIPLE|AGAIN|LDREFRTOS|IFELSE|PLDUQ|QMUL|STREF2CONST|THROWANY|ONLYTOPX|CTOS|LEQINT|DICTISETGETOPTREF|SUBDICTURPGET|DICTIDELGETREF|DUP|THIRD|INLINECALL|DICTUREMMAX|SINGLE|LDUX|DICTUSETB|TPOP|SCHKBITS|SETEXITALT|CALLDICT|POPCTR|DICTUMINREF|@addopb|UFITS|COMMIT|TRYARGS|ONE|POPROOT|CALLVAR|UNTRIPLE|PFXDICTADD|SUBDICTRPGET|PLDU|ATEXIT|SDBEGINSQ|LOGFLUSH|DICTGETNEXT|c1|MULCONST|QDIVMODR|LDDICTS|STILE4|@ensurebitrefs|THROWANYIFNOT|BITSIZE|HEXDUMP|THROWARGIFNOT|\}>UNTIL|DICTIADD|BCHKBITS\#|SPLITQ|NEWDICT|ENDC|RSHIFTR\#|LDIXQ|@inline|PRINTSTR|CADR|PFXDICTREPLACE|DICTMAXREF|STULE4|ISNZERO|LDILE4|SDFIRST|DICTREMMAXREF|DICTADDREF|FIRST|BOOLEVAL|@iscr\?|STBREFR_l|SDCNTLEAD1|s14|RANDSEED|\}>|DICTISETGET|PLDIXQ|BCHKBITSQ|\-ROT|SAVE|TUPLE|DICTUGET|CONFIGDICT|BCONCAT|RETTRUE|DICTUGETNEXTEQ|<\{|QUFITSX|s0|RET|STBREFRQ|\}>DO:|DICTIREPLACEGET|CALLXARGS|SCHKBITREFSQ|PLDDICTS|DICTUSETGET|STSLICER|SCHKBITREFS|DICTIGETPREVEQ|ISZERO|@Defop\(8u\+1\)|SETINDEXVARQ|ROTREV|UNPAIR|MULRSHIFT\#|PUXCPU|STUXRQ|INLINECALLDICT|DICTGET|DIV|DICTIADDREF|STIQ|\}>ELSE:|RETVARARGS|SBITREFS|@doifelse|LDILE4Q|JMPDICT|XC2PU|MULDIVMOD|STZERO|STVARINT16|SDPFX|JMPREF|@doafter<\{|LSHIFT\#|TRY:<\{|SUBDICTIRPGET|IFNOTRET|BINPRINT|SECOND|LDVARUINT16|NULLROTRIF|BREMBITREFS|BREMBITS|LSHIFT\#DIVR|ADDCONST|DUMPTOSFMT|\}>CONT|STIXQ|SSKIPLAST|POPCTRSAVE|SUB|BCHKREFSQ|STREFQ|MOD|@bigsridx|DICTUREMMINREF|PFXDICTDEL|REPEATEND|DROP2|PREPAREDICT|@normal\?|LDSLICEQ|PLDIX|SDSFX|c7|SAVEBOTHCTR|STBREFQ|HASHCU|BCHKBITSQ\#|JMPVAR|CHKSIGNS|DICTSETGETOPTREF|BBITREFS|STOPTREF|BCHKBITREFS|DICTUGETPREV|RETFALSE|INDEXVAR|SETFIRST|JMPXDATA|PUSHCTRX|\}END>s|GTINT|\-ROLLX|SWAP|c0|QSUB|ROT|DICTUMAXREF|GEQ|QDEC|QXOR|THROWIF|DICTISETGETB|@sridx\+|DICTDELGETREF|SPLIT|s9|PFXDICTSET|@sridxrange|SDCUTLAST|PLDSLICEXQ|SAVEBOTH|DICTIREMMIN|STU_l|AGAINEND|LDSLICE_l|THENRETALT|DICTUREPLACEREF|QADD|DROP|LDU|@Defop\(c\)|run_ticktock|PUSHPOW2|DICTDELGET|PUSHSLICE|PLDUZ|SAVEALTCTR|DEPTH|NOW|BRANCH|MULDIVR|LDSLICE|DICTSETGETREF|QPOW2|STUQ|STZEROES|DICTIGET|2ROT|SEMPTY|EQUAL|PLDUXQ|ACCEPT|ROLL|OVER2|DICTREPLACE|@dowhile|@pushatend|SDBEGINSXQ|DICTUREPLACEGETB|\}>ATEXIT|UNPACKFIRST|DICTREPLACEREF|NOP|BOOLOR|CALLX|@chkdicts|SETGASLIMIT|CALLXVARARGS|ATEXIT:<\{|POW2|s13|SETEXITALT:<\{|LSHIFTDIVR|DICTIMIN|PLDILE8Q|s\(\)|add\-lib|@range|MULDIV|SAVECTR|LDUXQ|INC|split_prepare|SDSUBSTR|STSLICE|JMPX|STBQ|POPSAVE|SUBDICTIGET|s10|LAST|DICTISETGETREF|DICTMINREF|SUBSLICE|c2|SETRETCTR|CHKDEPTH|FITS|IF:|DICTUREPLACE|SETTHIRDQ|SREFS|SWAP2|LDIQ|DICTSET|NEQINT|REPEAT|MIN|PLDDICTQ|QDIVC|STSLICERQ|SUBDICTUGET|SHA256U|LDILE8|@fail\-ifdef|@chkmaindef|LDULE4Q|SKIPOPTREF|CONFIGOPTPARAM|BLOCKLT|LDREF|IFBITJMP|GREATER|@atend|DICTADDGETB|PLDILE4Q|DICTIREPLACEGETB|DICTISET|DICTIDELGET|DICTSETGETB|@cridx|LDUQ|XCHG3|UNTIL|SETTHIRD|MYADDR|DICTIGETNEXT|DICTUGETNEXT|PLDUX|\-ROLL|SENDRAWMSG|HEXPRINT|PLDULE8|PUSHX|SDPSFX|QFITSX|NULLROTRIFNOT|REWRITESTDADDRQ|STONES|@sridx|DICTIGETOPTREF|si\(\)|JMPREFDATA|PUSHNULL|2SWAP|STB|@Defop\(4u\)|IFNOTJMP:<\{|PICK|STIR|INVERT|STIXRQ|DICTREPLACEGETB|DUP2|SETCPX|DEBUGSTR|QMULDIVMOD|@scomplete|DICTUDEL|POP|IFBITJMPREF|QUIET|MAX|STUXR|BLESSNUMARGS|UNTUPLE|DICTUDELGETREF|s11|QDIVMODC|NIL|ROLLX|IFNOTJMPREF|LDONES|@havebitrefs|BLKPUSH|CDDDR|DICTUREPLACEB|JMP|SDEMPTY|PUSHNEGPOW2|PUSH2|PREPARE|TRY|PROC:<\{|CHKNAN|s1|c\(\)|PLDIQ|SKIPDICT|DICTUSETGETREF|CONT|REPEAT:|XCPUXC|UBITSIZE|QTLEN|s\(\-2\)|INDEX2|SETCONTARGS|CONS|DUMPSTKTOP|LEQ|LDI_l|SREMPTY|RSHIFT\#|SETNUMVARARGS|\}END|UNTIL:)(?=\s|$)/;
+    var onload = function() {
         CodeMirror.defineSimpleMode("fift", {
-            // The start state contains the rules that are intially used
             start: [
-              // The regex matches the token, the token property contains the type
-              {regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string"},
-              // You can match multiple tokens at once. Note that the captured
-              // groups must span the whole string in this case
-              {regex: /(function)(\s+)([a-z$][\w$]*)/,
-               token: ["keyword", null, "variable-2"]},
-              // Rules are matched in the order in which they appear, so there is
-              // no ambiguity between this one and the one above
-              {regex: /(?:function|var|return|if|for|while|else|do|this)\b/,
-               token: "keyword"},
-              {regex: /true|false|null|undefined/, token: "atom"},
-              {regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
-               token: "number"},
-              {regex: /\/\/.*/, token: "comment"},
-              {regex: /\/(?:[^\\]|\\.)*?\//, token: "variable-3"},
-              // A next property will cause the mode to move to a different state
-              {regex: /\/\*/, token: "comment", next: "comment"},
-              {regex: /[-+\/*=<>!]+/, token: "operator"},
-              // indent and dedent properties guide autoindentation
-              {regex: /[\{\[\(]/, indent: true},
-              {regex: /[\}\]\)]/, dedent: true},
-              {regex: /[a-z$][\w$]*/, token: "variable"},
-              // You can embed other modes with the mode property. This rule
-              // causes all code between << and >> to be highlighted with the XML
-              // mode.
-              {regex: /<</, token: "meta", mode: {spec: "xml", end: />>/}}
+                // strings
+                { regex: /"(?:[^\\]|\\.)*?(?:"|$)/, token: "string" },
+                // slices
+                { regex: /(?<=\s|^)x\{[A-z0-9_]+\}(?=\s|$)/, token: "string-2" },
+                { regex: /(?<=\s|^)b\{[01]+\}(?=\s|$)/, token: "string-2" },
+                // bytes
+                { regex: /(?<=\s|^)B\{[A-z0-9_]+\}(?=\s|$)/, token: "string-3" },
+                // comments
+                { regex: /\/\/.*/, token: "comment" },
+                { regex: /\/\*/, token: "comment", next: "comment" },
+                // registers c0-7, s0-15
+                { regex: /(?<=\s|^)(?:c[0-7])|(?:s[0-9]{1,2})(?=\s|$)/, token: "atom" },
+                // asm constants: main, recv_internal, recv_external and booleans
+                { regex: /(?<=\s|^)(?:main|recv_internal|recv_external|true|false)(?=\s|$)/, token: "atom" },
+                // numbers
+                { regex: /(?<=\s|^)(?:(?:[+-]?[0-9]+\.?[0-9]*)|(?:0x[0-9a-f]+)|(?:0b[01]+))(?=\s|$)/i, token: "number" },
+                // builder <b ... b> and cell <s ... s> (multiline)
+                { regex: /(?<=\s|^)\<[bs](?=\s|$)/, token: "def" },
+                { regex: /(?<=\s|^)[bs]\>(?=\s|$)/, token: "def" },
+                // asm code <{ ... }>s/c and control instructions PROC, CONT, REPEAT, IF, ELSE, etc (multiline)
+                { regex: /(?<=\s|^)[A-Z:]*<\{(?=\s|$)/, token: "def" },
+                { regex: /(?<=\s|^)(?:\}(?:END)?>[A-Zsc:]?)(?=\s|$)/, token: "def" },
+                { regex: /(?<=\s|^)(?:\}>[A-Z]+<\{)(?=\s|$)/, token: "def" },
+                // word lists { ... } (multiline)
+                { regex: /(?<=\s|^)[xb]?\{(?=\s|$)/, token: "def" },
+                { regex: /(?<=\s|^)\}(?=\s)/, token: "def" },
+                // other definitions
+                { regex: /(?<=\s|^)(?:2?constant|variable|create|\(create\)|2?=:|:_?|::_?)(?=\s|$)/, token: "def" },
+                // words
+                { regex: /(?<=\s|^)(?:abort)(?=\")/, token: "keyword" },
+                { regex: builtin_words, token: "keyword"},
+                { regex: fift_words, token: "keyword"},
+                { regex: asm_words, token: "operator"},
             ],
-            // The multi-line comment state.
             comment: [
-              {regex: /.*?\*\//, token: "comment", next: "start"},
-              {regex: /.*/, token: "comment"}
+                { regex: /.*?\*\//, token: "comment", next: "start" },
+                { regex: /.*/, token: "comment" }
             ],
             // The meta property contains global information about the mode. It
             // can contain properties like lineComment, which are supported by
             // all modes, and also directives like dontIndentStates, which are
             // specific to simple modes.
             meta: {
-              dontIndentStates: ["comment"],
-              lineComment: "//"
+                dontIndentStates: ["comment"],
+                lineComment: "//"
             }
-          });
-        CodeMirror.defineMIME("text/x-fift", "fift");    
+        });
+        CodeMirror.defineMIME("text/x-fift", "fift");
+        CodeMirror.modeInfo.push({
+            ext: ["fif"],
+            mime: "text/x-fift",
+            mode: "fift",
+            name: "Fift"
+        });
     }
-
-    return {onload:onload}
-})
+    return { onload: onload }
+});
