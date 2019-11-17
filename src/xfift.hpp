@@ -29,7 +29,7 @@ namespace xfift {
     {    
     private:
 
-        std::string current_dir_;
+        std::vector<std::string> fift_path_;
         vm::TonDb ton_db_;
         fift::Dictionary dictionary_;
         fift::SourceLookup source_lookup_;

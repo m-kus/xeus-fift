@@ -7,28 +7,12 @@ namespace xfift
         fift_.configure();
     }
 
-    std::string html_escape(const std::string& data) {
-        std::string buffer;
-        buffer.reserve(data.size());
-        for(size_t pos = 0; pos != data.size(); ++pos) {
-            switch(data[pos]) {
-                case '&':  buffer.append("&amp;");       break;
-                case '\"': buffer.append("&quot;");      break;
-                case '\'': buffer.append("&apos;");      break;
-                case '<':  buffer.append("&lt;");        break;
-                case '>':  buffer.append("&gt;");        break;
-                default:   buffer.append(&data[pos], 1); break;
-            }
-        }
-        return std::move(buffer);
-    }
-
     nl::json make_pub_data(XResult res) {
         std::stringstream ss;
         if (!res.vmlog.empty()) {
             ss << "<pre style=\"background-color: #ffe7d1; padding: 10px;\">" << html_escape(res.vmlog) << "</pre>";
         }
-        ss << "<pre>" << html_escape(res.output) << "</pre>";
+        ss << "<pre>" << str::html_escape(res.output) << "</pre>";
 
         nl::json data;
         data["text/html"] = ss.str();
@@ -61,35 +45,18 @@ namespace xfift
         return kernel_res;
     }
 
-    std::string parse_token(const std::string& line, 
-                            std::size_t cursor_pos, 
-                            std::size_t& token_begin, 
-                            std::size_t& token_end) 
-    {
-        token_begin = line.find_last_of(' ', cursor_pos > 0 ? cursor_pos - 1 : 0);
-        if (token_begin == std::string::npos) {
-            token_begin = 0;
-        } else {
-            token_begin++;
-        }
-        token_end = line.find_first_of(' ', cursor_pos); 
-        if (token_end == std::string::npos) {
-            token_end = line.size();
-        }
-        return std::move(line.substr(token_begin, token_end - token_begin));
-    }
-
     nl::json interpreter::complete_request_impl(const std::string& code, int cursor_pos)
     {
         nl::json kernel_res;
+        std::string token;
         std::vector<std::string> matches;
-        std::size_t cursor_start, cursor_end;
-        std::string token = parse_token(code, cursor_pos, cursor_start, cursor_end);
+
+        auto token_pos = str::parse_token(code, cursor_pos, token);
 
         if (fift_.code_complete(token, matches)) {
             kernel_res["matches"] = matches;
-            kernel_res["cursor_start"] = cursor_start;
-            kernel_res["cursor_end"] = cursor_end;
+            kernel_res["cursor_start"] = token[0] == '"' ? token_pos.first + 1 : token_pos.first;
+            kernel_res["cursor_end"] = token_pos.second;
         } else {
             kernel_res["matches"] = nl::json::array();
             kernel_res["cursor_start"] = cursor_pos;
@@ -105,10 +72,11 @@ namespace xfift
                                                int detail_level)
     {
         nl::json kernel_res;
-        std::size_t cursor_start, cursor_end;
-        std::string token = parse_token(code, cursor_pos, cursor_start, cursor_end);
+        std::string token;
+
+        str::parse_token(code, cursor_pos, token);
         std::string docstring = fift_.code_inspect(token);
-        
+
         if (!docstring.empty()) {
             kernel_res["found"] = true;
             kernel_res["data"]["text/plain"] = docstring;

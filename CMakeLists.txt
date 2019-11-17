@@ -79,6 +79,7 @@ include_directories(${EXECUTABLE_NAME} PUBLIC
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC 
     xeus_static 
     fift-lib
+    stdc++fs
 )
 
 if (APPLE)
@@ -121,6 +122,7 @@ target_link_libraries(${XFIFT_TEST_EXE} PUBLIC
     gtest_main 
     xeus_static 
     fift-lib
+    stdc++fs
 )
 
 add_test(NAME "test" COMMAND test)

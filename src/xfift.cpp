@@ -65,19 +65,17 @@ namespace xfift {
     {
         SET_VERBOSITY_LEVEL(verbosity_DEBUG);
 
-        std::vector<std::string> source_include_path;
         const char* path = std::getenv("FIFTPATH");
-        str::split(path ? path : "/usr/lib/fift", ':', source_include_path);
+        str::split(path ? path : "/usr/lib/fift", ':', fift_path_);
 
         auto r_current_dir = td::realpath(".");
         if (r_current_dir.is_ok()) {
-            current_dir_ = r_current_dir.move_as_ok();
-            ctx_.currentd_dir = current_dir_;
-            source_include_path.push_back(current_dir_);
+            ctx_.currentd_dir = r_current_dir.move_as_ok();
+            fift_path_.push_back(ctx_.currentd_dir);
         }
 
         std::clog << "Include directories:\n";
-        for (auto& path : source_include_path) {
+        for (auto& path : fift_path_) {
             std::clog << path << std::endl;
             source_lookup_.add_include_path(path);
         }
@@ -116,7 +114,14 @@ namespace xfift {
     bool XFift::code_complete(const std::string& token, std::vector<std::string>& matches)
     {
         if (!token.empty() && token[0] == '"') {
-            // TODO
+            fs::path p{token.substr(1)};
+            if (p.has_parent_path()) {
+                path::complete(p, matches);
+            } else {
+                for (auto& dir : fift_path_) {
+                    path::complete(fs::path{dir} / p, matches);
+                }
+            }
         } else {
             std::for_each(dictionary_.begin(), dictionary_.end(), [&](const std::pair<std::string, WordRef>& x) {
                 if (token.empty() || std::equal(token.begin(), token.end(), x.first.begin())) {

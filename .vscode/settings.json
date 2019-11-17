@@ -76,6 +76,8 @@
         "*.hpp.in": "cpp",
         "*.json.in": "json",
         "*.def": "cpp",
-        "fft": "cpp"
+        "fft": "cpp",
+        "*.in": "cpp",
+        "filesystem": "cpp"
     }
 }
