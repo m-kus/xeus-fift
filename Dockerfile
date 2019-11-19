@@ -13,23 +13,25 @@ WORKDIR /xeus-fift/build
 RUN cmake ..
 RUN make xeus-fift
 
-RUN echo "Jupyter kernel for the Fift language\n" > description-pak \
+RUN export XFIFT_VERSION=$(bash /xeus-fift/scripts/xfift_version.sh) \
+    && echo "Jupyter kernel for the Fift language\n" > description-pak \
     && checkinstall \
         --pkgname="xeus-fift" \
-        --pkgversion="0.1.0" \
+        --pkgversion=$XFIFT_VERSION \
         --pkgrelease="1" \
         --arch="amd64" \
         --pkglicense="GPL-3" \
         --pkgsource="https://github.com/m-kus/xeus-fift" \
         --maintainer="mz@baking-bad.org" \
-        --install=no -y -D -d2 make install
+        --install=no -y -D -d2 make install \
+    && mv xeus-fift_$XFIFT_VERSION-1_amd64.deb xeus-fift.deb
 
 
 FROM python:3.7-slim-buster
 
 RUN pip install notebook
 
-COPY --from=builder /xeus-fift/build/xeus-fift_0.1.0-1_amd64.deb /tmp/xeus-fift.deb
+COPY --from=builder /xeus-fift/build/xeus-fift.deb /tmp/xeus-fift.deb
 RUN dpkg -i /tmp/xeus-fift.deb
 
 RUN useradd -ms /bin/bash jupyter

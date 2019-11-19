@@ -15,10 +15,12 @@ script:
   - ./xeus-fift-test
 
 before_deploy:
+  - export XFIFT_VERSION=$(bash /xeus-fift/scripts/xfift_version.sh)
+  - echo "Jupyter kernel for the Fift language\n" > description-pak
   - fakeroot checkinstall \
     --arch="amd64" \
     --pkgname="xeus-fift" \
-    --pkgversion="0.1.0" \
+    --pkgversion=$XFIFT_VERSION \
     --pkgrelease="1" \
     --pkglicense="GPL-3" \
     --pkgsource="https://github.com/m-kus/xeus-fift" \
@@ -28,7 +30,7 @@ before_deploy:
 deploy:
   provider: releases
   api_key: $GH_TOKEN
-  file: xeus-fift_0.1.0-1_amd64.deb
+  file: xeus-fift_$XFIFT_VERSION-1_amd64.deb
   skip_cleanup: true
   draft: true
   on:

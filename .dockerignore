@@ -1,8 +1,12 @@
-build/
-scripts/
-share/jupyter/kernels/fift/kernel.json
+__pycache__/
 .idea/
 .vscode/
-__pycache__/
+.travis.yml
+.git/
+.gitignore/
+.gitmodules/
 .pytest_cache/
+build/
+share/jupyter/kernels/fift/kernel.json
 Dockerfile
+README.md
