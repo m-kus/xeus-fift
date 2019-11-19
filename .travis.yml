@@ -23,8 +23,8 @@ before_deploy:
     --pkgversion=$XFIFT_VERSION \
     --pkgrelease="1" \
     --pkglicense="GPL-3" \
-    --pkgsource="https://github.com/m-kus/xeus-fift" \
-    --maintainer="mz@baking-bad.org" \
+    --pkgsource="https://github.com/atomex-me/xeus-fift" \
+    --maintainer="mz@atomex.me" \
     --install=no -y -D -d2 make install
 
 deploy:
