@@ -1,9 +1,21 @@
 language: cpp
+compiler: clang
 
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+    packages:
+      - pkg-config
+      - libssl-dev
+      - zlib1g-dev
+      - uuid-dev
+      - wget
+      - checkinstall
+
+install:
+  - wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh
+  - bash cmake-3.15.5-Linux-x86_64.sh --skip-license
 
 before_script:
   - mkdir build
@@ -12,10 +24,12 @@ before_script:
   - make
 
 script:
+  - cd build
   - ./xeus-fift-test
 
 before_deploy:
-  - export XFIFT_VERSION=$(bash /xeus-fift/scripts/xfift_version.sh)
+  - cd build
+  - export XFIFT_VERSION=$(bash ../scripts/xfift_version.sh)
   - echo "Jupyter kernel for the Fift language\n" > description-pak
   - fakeroot checkinstall \
     --arch="amd64" \
