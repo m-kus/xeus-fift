@@ -1,5 +1,8 @@
 build/
+scripts/
 share/jupyter/kernels/fift/kernel.json
 .idea/
+.vscode/
 __pycache__/
 .pytest_cache/
+Dockerfile

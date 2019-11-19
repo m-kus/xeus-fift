@@ -100,7 +100,7 @@ namespace xfift
     {
         nl::json kernel_res;
         kernel_res["implementation"] = "xeus-fift";
-        kernel_res["implementation_version"] = "0.1.0";
+        kernel_res["implementation_version"] = XEUS_FIFT_VERSION;
         kernel_res["language_info"]["name"] = "fift";
         kernel_res["language_info"]["version"] = "0.5";
         kernel_res["language_info"]["mimetype"] = "text/x-fift";

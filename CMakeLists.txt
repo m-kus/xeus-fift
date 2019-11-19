@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 3.15.2)
 project(xeus-fift)
 
 set(EXECUTABLE_NAME xeus-fift)
@@ -19,33 +19,32 @@ configure_file (
 # Dependencies
 # ============
 
-# Be sure to use recent versions
-set(xeus_REQUIRED_VERSION 0.21.1)
-set(cppzmq_REQUIRED_VERSION 4.3.0)
-
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/libzmq)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/libzmq EXCLUDE_FROM_ALL)
+set(ZeroMQ_DIR ${CMAKE_BINARY_DIR}/third-party/libzmq)
 
+set(cppzmq_REQUIRED_VERSION 4.3.0)
 set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/cppzmq)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/cppzmq EXCLUDE_FROM_ALL)
 set(cppzmq_DIR ${CMAKE_BINARY_DIR}/third-party/cppzmq)
 
 set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/xtl)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/xtl EXCLUDE_FROM_ALL)
 set(xtl_DIR ${CMAKE_BINARY_DIR}/third-party/xtl)
 
 set(JSON_BuildTests OFF CACHE INTERNAL "" FORCE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/nlohmann_json)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/nlohmann_json EXCLUDE_FROM_ALL)
 set(nlohmann_json_DIR ${CMAKE_BINARY_DIR}/third-party/nlohmann_json)
 
+set(xeus_REQUIRED_VERSION 0.21.1)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/xeus)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/xeus EXCLUDE_FROM_ALL)
 
 set(TON_ONLY_TONLIB ON CACHE BOOL "" FORCE)
 set(TON_USE_ROCKSDB OFF CACHE BOOL "" FORCE)
 set(TON_USE_ABSEIL OFF CACHE BOOL "" FORCE)
 set(TDDB_USE_ROCKSDB OFF CACHE BOOL "" FORCE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/ton)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/ton EXCLUDE_FROM_ALL)
 
 # Flags
 # =====
@@ -77,6 +76,7 @@ include_directories(${EXECUTABLE_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/third-party/cppzmq
 )
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC 
+    libzmq-static
     xeus_static 
     fift-lib
     stdc++fs
@@ -102,7 +102,7 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES
 
 set(XFIFT_TEST_EXE "xeus-fift-test")
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/googletest)
+add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/googletest EXCLUDE_FROM_ALL)
 
 set(SRC_TESTS
     "${CMAKE_SOURCE_DIR}/src/xfift.cpp"
@@ -119,7 +119,8 @@ target_include_directories(${XFIFT_TEST_EXE} PUBLIC
 )
 target_link_libraries(${XFIFT_TEST_EXE} PUBLIC
     gtest 
-    gtest_main 
+    gtest_main
+    libzmq-static
     xeus_static 
     fift-lib
     stdc++fs
@@ -129,6 +130,8 @@ add_test(NAME "test" COMMAND test)
 
 # Installation
 # ============
+
+set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
 
 # Install my_kernel
 install(TARGETS ${EXECUTABLE_NAME}
@@ -142,3 +145,7 @@ set(MY_KERNELSPEC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels)
 install(DIRECTORY ${MY_KERNELSPEC_DIR}
         DESTINATION ${XJUPYTER_DATA_DIR}
         PATTERN "*.in" EXCLUDE)
+
+# Copy Fift libraries
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/fift/lib/ 
+        DESTINATION /usr/lib/fift)

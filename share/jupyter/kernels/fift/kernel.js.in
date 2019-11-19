@@ -5,7 +5,9 @@ define([
     var builtin_words = /(?<=\s|^)(?:(builtin_words))(?=\s|$)/;
     var fift_words = /(?<=\s|^)(?:(fift_words))(?=\s|$)/;
     var asm_words = /(?<=\s|^)(?:(asm_words))(?=\s|$)/;
+    console.log("Here I am");
     var onload = function() {
+        console.log("Yeeeeee");
         CodeMirror.defineSimpleMode("fift", {
             start: [
                 // strings
@@ -19,28 +21,32 @@ define([
                 { regex: /\/\/.*/, token: "comment" },
                 { regex: /\/\*/, token: "comment", next: "comment" },
                 // registers c0-7, s0-15
-                { regex: /(?<=\s|^)(?:c[0-7])|(?:s[0-9]{1,3})(?=\s|$)/, token: "meta" },
-                // asm constants: main, recv_internal, recv_external and booleans
-                { regex: /(?<=\s|^)(?:main|recv_internal|recv_external|true|false)(?=\s|$)/, token: "meta" },
+                { regex: /(?<=\s|^)(?:c[0-7])|(?:s[0-9]{1,3})(?=\s|$)/, token: "builtin" },
+                // asm constants
+                { regex: /(?<=\s|^)(?:main|recv_internal|recv_external)(?=\s|$)/, token: "builtin" },
+                // vm specific words
+                { regex: /(?<=\s|^)(?:runvmcode|runvmdict|runvm|runvmctx|gasrunvmcode|gasrunvmdict|gasrunvm|gasrunvmctx)(?=\s|$)/, token: "operator" },
+                // some control words
+                { regex: /(?<=\s|^)(?:true|false|if|ifnot|cond|until|while|abort|words|does|[\[\(]?compile[\]\)]?|\.s?|csr\.|include)(?=\s|$)/, token: "keyword" },
                 // numbers
                 { regex: /(?<=\s|^)(?:(?:[+-]?[0-9]+\.?[0-9]*)|(?:0x[0-9a-f]+)|(?:0b[01]+))(?=\s|$)/i, token: "number" },
                 // builder <b ... b> and cell <s ... s> (multiline)
                 { regex: /(?<=\s|^)\<[bs](?=\s|$)/, token: "atom", indent: true },
                 { regex: /(?<=\s|^)[bs]\>(?=\s|$)/, token: "atom", dedent: true },
                 // asm code <{ ... }>s/c and control instructions PROC, CONT, REPEAT, IF, ELSE, etc (multiline)
-                { regex: /(?<=\s|^)[A-Z:]*<\{(?=\s|$)/, token: "builtin", indent: true },
-                { regex: /(?<=\s|^)(?:\}(?:END)?>[A-Zsc:]?)(?=\s|$)/, token: "bultin", dedent: true },
-                { regex: /(?<=\s|^)(?:\}>[A-Z]+<\{)(?=\s|$)/, token: "builtin" },
+                { regex: /(?<=\s|^)[A-Z:]*<\{(?=\s|$)/, token: "atom", indent: true },
+                { regex: /(?<=\s|^)(?:\}(?:END)?>[A-Zsc:]*)(?=\s|$)/, token: "atom", dedent: true },
+                { regex: /(?<=\s|^)(?:\}>[A-Z]+<\{)(?=\s|$)/, token: "atom" },
                 // word lists { ... } (multiline)
-                { regex: /(?<=\s|^)\{(?=\s|$)/, token: "variable-2", indent: true },
-                { regex: /(?<=\s|^)\}(?=\s|$)/, token: "variable-2", dedent: true },
+                { regex: /(?<=\s|^)\{(?=\s|$)/, token: "atom", indent: true },
+                { regex: /(?<=\s|^)\}(?=\s|$)/, token: "atom", dedent: true },
                 // definitions
-                { regex: /(?<=\s|^)(?:2?constant|variable|2?=:|:_?|::_?)(?=\s|$)/, token: "keyword", next: "def" },
+                { regex: /(?<=\s|^)(?:2?constant|variable|2?=:|:_?|::_?|create)(?=\s|$)/, token: "builtin", next: "def" },
                 // words
                 { regex: /(?<=\s|^)(?:abort)(?=\")/, token: "keyword" },
-                { regex: builtin_words, token: "keyword"},
-                { regex: fift_words, token: "variable"},
-                { regex: asm_words, token: "operator"},
+                { regex: builtin_words, token: "variable-2"},
+                { regex: fift_words, token: "variable-3"},
+                { regex: asm_words, token: "meta"},
                 // fallback
                 { regex: /[^\s]+/, token: "variable"},
             ],
