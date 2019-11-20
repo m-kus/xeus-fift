@@ -5,7 +5,6 @@ before_install:
   - wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh -P /tmp/
   - sudo bash /tmp/cmake-3.15.5-Linux-x86_64.sh --skip-license --prefix=/usr/local
   - export PATH=/usr/local/bin:$PATH
-  - cmake --version
 
 addons:
   apt:
@@ -27,6 +26,7 @@ before_script:
 
 script:
   - cd $TRAVIS_BUILD_DIR/build
+  - export FIFTPATH=$TRAVIS_BUILD_DIR/third-party/ton/crypto/fift/lib
   - ./xeus-fift-test
 
 before_deploy:
@@ -49,6 +49,6 @@ deploy:
   file: $TRAVIS_BUILD_DIR/build/xeus-fift_$XFIFT_VERSION-1_amd64.deb
   skip_cleanup: true
   draft: true
-  on:
-    branch: master
-    type: push
+  # on:
+  #   branch: master
+  #   type: push
