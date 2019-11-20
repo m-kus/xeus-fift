@@ -7,48 +7,48 @@ before_install:
   - export PATH=/usr/local/bin:$PATH
   - cmake --version
 
-# addons:
-#   apt:
-#     sources:
-#       - ubuntu-toolchain-r-test
-#     packages:
-#       - pkg-config
-#       - libssl-dev
-#       - zlib1g-dev
-#       - uuid-dev
-#       - wget
-#       - checkinstall
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - pkg-config
+      - libssl-dev
+      - zlib1g-dev
+      - uuid-dev
+      - wget
+      - checkinstall
 
-# before_script:
-#   - mkdir build
-#   - cd build
-#   - cmake ..
-#   - make
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
 
-# script:
-#   - cd build
-#   - ./xeus-fift-test
+script:
+  - cd $TRAVIS_BUILD_DIR/build
+  - ./xeus-fift-test
 
-# before_deploy:
-#   - cd build
-#   - export XFIFT_VERSION=$(bash ../scripts/xfift_version.sh)
-#   - echo "Jupyter kernel for the Fift language\n" > description-pak
-#   - fakeroot checkinstall \
-#     --arch="amd64" \
-#     --pkgname="xeus-fift" \
-#     --pkgversion=$XFIFT_VERSION \
-#     --pkgrelease="1" \
-#     --pkglicense="GPL-3" \
-#     --pkgsource="https://github.com/atomex-me/xeus-fift" \
-#     --maintainer="mz@atomex.me" \
-#     --install=no -y -D -d2 make install
+before_deploy:
+  - cd $TRAVIS_BUILD_DIR/build
+  - export XFIFT_VERSION=$(bash ../scripts/xfift_version.sh)
+  - echo "Jupyter kernel for the Fift language\n" > description-pak
+  - fakeroot checkinstall \
+    --arch="amd64" \
+    --pkgname="xeus-fift" \
+    --pkgversion=$XFIFT_VERSION \
+    --pkgrelease="1" \
+    --pkglicense="GPL-3" \
+    --pkgsource="https://github.com/atomex-me/xeus-fift" \
+    --maintainer="mz@atomex.me" \
+    --install=no -y -D -d2 make install
 
-# deploy:
-#   provider: releases
-#   api_key: $GH_TOKEN
-#   file: xeus-fift_$XFIFT_VERSION-1_amd64.deb
-#   skip_cleanup: true
-#   draft: true
-#   on:
-#     branch: master
-#     type: push
+deploy:
+  provider: releases
+  api_key: $GH_TOKEN
+  file: $TRAVIS_BUILD_DIR/build/xeus-fift_$XFIFT_VERSION-1_amd64.deb
+  skip_cleanup: true
+  draft: true
+  on:
+    branch: master
+    type: push
