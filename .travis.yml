@@ -3,9 +3,9 @@ compiler: clang
 
 before_install:
   - which cmake
-#   - sudo apt purge cmake
-#   - wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh -P /tmp/
-#   - sudo bash /tmp/cmake-3.15.5-Linux-x86_64.sh --skip-license  --prefix=/usr/local
+  - wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh -P /tmp/
+  - sudo bash /tmp/cmake-3.15.5-Linux-x86_64.sh --skip-license  --prefix=/usr/local
+  - which cmake
 
 # addons:
 #   apt:
