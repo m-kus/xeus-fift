@@ -78,6 +78,7 @@
         "*.def": "cpp",
         "fft": "cpp",
         "*.in": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "colab.ipynb": "json"
     }
 }
