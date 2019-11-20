@@ -2,52 +2,53 @@ language: cpp
 compiler: clang
 
 before_install:
-  - sudo apt purge cmake
-  - wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh -P /tmp/
-  - sudo bash /tmp/cmake-3.15.5-Linux-x86_64.sh --skip-license  --prefix=/usr/local
+  - which cmake
+#   - sudo apt purge cmake
+#   - wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.sh -P /tmp/
+#   - sudo bash /tmp/cmake-3.15.5-Linux-x86_64.sh --skip-license  --prefix=/usr/local
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - pkg-config
-      - libssl-dev
-      - zlib1g-dev
-      - uuid-dev
-      - wget
-      - checkinstall
+# addons:
+#   apt:
+#     sources:
+#       - ubuntu-toolchain-r-test
+#     packages:
+#       - pkg-config
+#       - libssl-dev
+#       - zlib1g-dev
+#       - uuid-dev
+#       - wget
+#       - checkinstall
 
-before_script:
-  - mkdir build
-  - cd build
-  - cmake ..
-  - make
+# before_script:
+#   - mkdir build
+#   - cd build
+#   - cmake ..
+#   - make
 
-script:
-  - cd build
-  - ./xeus-fift-test
+# script:
+#   - cd build
+#   - ./xeus-fift-test
 
-before_deploy:
-  - cd build
-  - export XFIFT_VERSION=$(bash ../scripts/xfift_version.sh)
-  - echo "Jupyter kernel for the Fift language\n" > description-pak
-  - fakeroot checkinstall \
-    --arch="amd64" \
-    --pkgname="xeus-fift" \
-    --pkgversion=$XFIFT_VERSION \
-    --pkgrelease="1" \
-    --pkglicense="GPL-3" \
-    --pkgsource="https://github.com/atomex-me/xeus-fift" \
-    --maintainer="mz@atomex.me" \
-    --install=no -y -D -d2 make install
+# before_deploy:
+#   - cd build
+#   - export XFIFT_VERSION=$(bash ../scripts/xfift_version.sh)
+#   - echo "Jupyter kernel for the Fift language\n" > description-pak
+#   - fakeroot checkinstall \
+#     --arch="amd64" \
+#     --pkgname="xeus-fift" \
+#     --pkgversion=$XFIFT_VERSION \
+#     --pkgrelease="1" \
+#     --pkglicense="GPL-3" \
+#     --pkgsource="https://github.com/atomex-me/xeus-fift" \
+#     --maintainer="mz@atomex.me" \
+#     --install=no -y -D -d2 make install
 
-deploy:
-  provider: releases
-  api_key: $GH_TOKEN
-  file: xeus-fift_$XFIFT_VERSION-1_amd64.deb
-  skip_cleanup: true
-  draft: true
-  on:
-    branch: master
-    type: push
+# deploy:
+#   provider: releases
+#   api_key: $GH_TOKEN
+#   file: xeus-fift_$XFIFT_VERSION-1_amd64.deb
+#   skip_cleanup: true
+#   draft: true
+#   on:
+#     branch: master
+#     type: push
