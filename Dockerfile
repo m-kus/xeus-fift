@@ -39,4 +39,4 @@ USER jupyter
 WORKDIR /home/jupyter
 
 EXPOSE 8888
-CMD jupyter notebook --port=8888 --ip=0.0.0.0 --no-browser --no-mathjax
+ENTRYPOINT [ "jupyter",  "notebook", "--port=8888", "--ip=0.0.0.0", "--no-browser", "--no-mathjax"]

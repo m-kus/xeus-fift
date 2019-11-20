@@ -33,15 +33,7 @@ before_deploy:
   - cd $TRAVIS_BUILD_DIR/build
   - export XFIFT_VERSION=$(bash ../scripts/xfift_version.sh)
   - echo "Jupyter kernel for the Fift language\n" > description-pak
-  - sudo checkinstall \
-    --arch="amd64" \
-    --pkgname="xeus-fift" \
-    --pkgversion=$XFIFT_VERSION \
-    --pkgrelease="1" \
-    --pkglicense="GPL-3" \
-    --pkgsource="https://github.com/atomex-me/xeus-fift" \
-    --maintainer="mz@atomex.me" \
-    --install=no -y -D -d2 make install
+  - sudo checkinstall --arch="amd64" --pkgname="xeus-fift" --pkgversion=$XFIFT_VERSION --pkgrelease="1" --pkglicense="GPL-3" --pkgsource="https://github.com/atomex-me/xeus-fift" --maintainer="mz@atomex.me" --install=no -y -D -d2 make install
 
 deploy:
   provider: releases
