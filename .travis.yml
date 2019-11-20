@@ -33,7 +33,7 @@ before_deploy:
   - cd $TRAVIS_BUILD_DIR/build
   - export XFIFT_VERSION=$(bash ../scripts/xfift_version.sh)
   - echo "Jupyter kernel for the Fift language\n" > description-pak
-  - fakeroot checkinstall \
+  - sudo checkinstall \
     --arch="amd64" \
     --pkgname="xeus-fift" \
     --pkgversion=$XFIFT_VERSION \
@@ -49,6 +49,5 @@ deploy:
   file: $TRAVIS_BUILD_DIR/build/xeus-fift_$XFIFT_VERSION-1_amd64.deb
   skip_cleanup: true
   draft: true
-  # on:
-  #   branch: master
-  #   type: push
+  on:
+    branch: master
