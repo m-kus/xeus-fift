@@ -37,9 +37,10 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: $GH_TOKEN
+  token: $GH_TOKEN
   file: $TRAVIS_BUILD_DIR/build/xeus-fift_$XFIFT_VERSION-1_amd64.deb
-  skip_cleanup: true
   draft: true
+  edge: true
+  overwrite: true
   on:
     branch: master
