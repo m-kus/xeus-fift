@@ -1,13 +1,8 @@
-#pragma once
+#include "xutil.hpp"
 
-#include <experimental/filesystem>
-#include <td/utils/Parser.h>
+namespace xutil {
 
-namespace fs = std::experimental::filesystem;
-
-namespace str {
-
-    static inline std::string strip(const std::string& s) 
+    std::string strip(const std::string& s) 
     {
         if (s.empty()) {
             return s;
@@ -18,7 +13,7 @@ namespace str {
         return std::move(s.substr(first, last - first + 1));
     }
 
-    static inline void split(std::string s, char delim, std::vector<std::string>& res) 
+    void split(std::string s, char delim, std::vector<std::string>& res) 
     {
         td::Parser parser(s);
         while (!parser.empty()) {
@@ -30,8 +25,7 @@ namespace str {
         }
     }
 
-    using token_pos = std::pair<std::size_t, std::size_t>;
-    static inline token_pos parse_token(const std::string& line, std::size_t cursor_pos, std::string& res) 
+    token_pos parse_token(const std::string& line, std::size_t cursor_pos, std::string& res) 
     {
         auto token_begin = line.find_last_of(' ', cursor_pos > 0 ? cursor_pos - 1 : 0);
         if (token_begin == std::string::npos) {
@@ -47,7 +41,7 @@ namespace str {
         return std::make_pair(token_begin, token_end);
     }
 
-    static inline std::string html_escape(const std::string& data) 
+    std::string html_escape(const std::string& data) 
     {
         std::string buffer;
         buffer.reserve(data.size());
@@ -63,11 +57,8 @@ namespace str {
         }
         return std::move(buffer);
     }
-}
 
-namespace path {
-
-    static inline std::size_t complete(const fs::path& path, std::vector<std::string>& matches) 
+    std::size_t path_complete(const fs::path& path, std::vector<std::string>& matches) 
     {
         fs::path directory, prefix;
         if (fs::is_directory(path)) {

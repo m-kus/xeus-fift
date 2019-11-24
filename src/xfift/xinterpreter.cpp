@@ -1,4 +1,5 @@
 #include "xinterpreter.hpp"
+#include "version.h"
 
 namespace xfift
 {
@@ -12,7 +13,7 @@ namespace xfift
         if (!res.vmlog.empty()) {
             ss << "<pre style=\"background-color: #ffe7d1; padding: 10px;\">" << html_escape(res.vmlog) << "</pre>";
         }
-        ss << "<pre>" << str::html_escape(res.output) << "</pre>";
+        ss << "<pre>" << html_escape(res.output) << "</pre>";
 
         nl::json data;
         data["text/html"] = ss.str();
@@ -51,7 +52,7 @@ namespace xfift
         std::string token;
         std::vector<std::string> matches;
 
-        auto token_pos = str::parse_token(code, cursor_pos, token);
+        auto token_pos = parse_token(code, cursor_pos, token);
 
         if (fift_.code_complete(token, matches)) {
             kernel_res["matches"] = matches;
@@ -74,7 +75,7 @@ namespace xfift
         nl::json kernel_res;
         std::string token;
 
-        str::parse_token(code, cursor_pos, token);
+        parse_token(code, cursor_pos, token);
         std::string docstring = fift_.code_inspect(token);
 
         if (!docstring.empty()) {
