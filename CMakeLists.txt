@@ -151,10 +151,14 @@ set(XFIFT_TEST_EXE "xeus-fift-test")
 add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/googletest EXCLUDE_FROM_ALL)
 
 set(SRC_TESTS
+    "${CMAKE_SOURCE_DIR}/src/xfunc/xfunc.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/codegen.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/symguard.cpp"
     "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
     "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
     "${CMAKE_SOURCE_DIR}/src/xutil.cpp"
     "${CMAKE_SOURCE_DIR}/test/test_xfift.cpp"
+    "${CMAKE_SOURCE_DIR}/test/test_xfunc.cpp"
     "${CMAKE_SOURCE_DIR}/test/main.cpp"
 )
 
@@ -168,8 +172,9 @@ target_link_libraries(${XFIFT_TEST_EXE} PUBLIC
     gtest 
     gtest_main
     libzmq-static
-    xeus_static 
+    xeus_static
     fift-lib
+    func-lib
     stdc++fs
 )
 

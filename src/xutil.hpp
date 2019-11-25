@@ -40,5 +40,7 @@ namespace xutil {
         XResult(src::Fatal& fatal);
         XResult(src::ParseError& error);
         XResult(funC::UnifyError& unif_err);
+
+        XResult vm_result();
     };
 }

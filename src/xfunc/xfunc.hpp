@@ -3,7 +3,7 @@
 #include <regex>
 #include <unordered_map>
 
-#include <ton/crypto/parser/symtable.h>
+#include <ton/crypto/func/func.h>
 
 #include "xutil.hpp"
 
@@ -27,9 +27,7 @@ namespace xfunc {
         global_sym_guard(const std::string& expr);
         virtual ~global_sym_guard();
 
-        bool empty() const;
-        bool has(const std::string& name) const;
-        void analyze_new(int cycles=8);
+        bool not_a_func() const;
     };
 
     class XFunc

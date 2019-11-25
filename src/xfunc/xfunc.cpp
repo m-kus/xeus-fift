@@ -1,5 +1,3 @@
-#include <ton/crypto/func/func.h>
-
 #include "xfunc.hpp"
 #include "xfift/xfift.hpp"
 
@@ -17,22 +15,22 @@ namespace xfunc {
 
     inline std::string format_main(const std::string& expr) {
         std::stringstream ss;
-        ss << "void main() {\n" << expr << "\n}";
+        ss << "_ main() {\n" << expr;
+        std::size_t ending = expr.find_last_not_of(" \r\n\t");
+        if (ending != -1 && expr[ending] != ';') {
+            ss << ';';
+        }
+        ss << "\n}";
         return ss.str();
     }
 
     XResult XFunc::do_parse(const std::string& expr) {
         global_sym_guard sym_guard(expr);
-        if (sym_guard.has("main")) {
-            return XResult("Put main's body in the cell instead");
-        }
-        
-        std::stringstream ss(sym_guard.empty() ? format_main(expr) : expr);
+        std::stringstream ss(sym_guard.not_a_func() ? format_main(expr) : expr);
         src::FileDescr fd{"stdin", true};
 
         try {
             funC::parse_source(&ss, &fd);
-            sym_guard.analyze_new();
         } catch (src::Fatal& fatal) {
             return XResult(fatal);
         } catch (src::ParseError& error) {
@@ -50,12 +48,19 @@ namespace xfunc {
 
         try {
             std::string script = generate_fift_script();
-            return fift.do_interpret(script);
+            XResult res = fift.do_interpret(script);
+            if (res.code == 0) {
+                return res.vm_result();
+            } else {
+                return res;
+            }
         } catch (src::Fatal& fatal) {
             return XResult(fatal);
         } catch (src::ParseError& error) {
             return XResult(error);
         }
+
+        return XResult();
     }
 
     bool XFunc::code_complete(const std::string& token, std::vector<std::string>& matches) {
