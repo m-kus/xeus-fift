@@ -12,6 +12,7 @@ namespace xfift {
 
     void reset_global_state();
     std::string generate_fift_script();
+    std::string parse_expression(const std::string& expr, std::vector<std::string>& func_names);
 
     class global_sym_guard
     {

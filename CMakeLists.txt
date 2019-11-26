@@ -113,7 +113,8 @@ set_target_properties(${XFIFT_EXE} PROPERTIES
 
 set(XFUNC_SRC 
     "${CMAKE_SOURCE_DIR}/src/xfunc/xfunc.cpp"
-    "${CMAKE_SOURCE_DIR}/src/xfunc/symdef.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/symguard.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/codegen.cpp"
     "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
     "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
     "${CMAKE_SOURCE_DIR}/src/xutil.cpp"
@@ -162,7 +163,8 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/googletest EXCLUDE_FROM_ALL)
 
 set(SRC_TESTS
     "${CMAKE_SOURCE_DIR}/src/xfunc/xfunc.cpp"
-    "${CMAKE_SOURCE_DIR}/src/xfunc/symdef.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/symguard.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/codegen.cpp"
     "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
     "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
     "${CMAKE_SOURCE_DIR}/src/xutil.cpp"
