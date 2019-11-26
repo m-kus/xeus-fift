@@ -10,6 +10,7 @@ using namespace sym;
 
 namespace xfift {
 
+    void reset_global_state();
     std::string generate_fift_script();
 
     class global_sym_guard
@@ -30,7 +31,7 @@ namespace xfift {
     public:
 
         XFunc() {}
-        virtual ~XFunc() {}
+        virtual ~XFunc();
 
         void configure();
         XResult do_interpret(const std::string& expr);

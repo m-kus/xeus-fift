@@ -20,6 +20,8 @@ namespace xfift {
         }
 
         if (func_names.empty()) {
+            func_names.push_back("main");
+
             std::stringstream ss;
             ss << "_ main() {\n" << expr;
             std::size_t ending = expr.find_last_not_of(" \r\n\t");
@@ -33,7 +35,11 @@ namespace xfift {
         }
     }
 
-    void XFunc::configure() {
+    XFunc::~XFunc() {
+        reset_global_state();
+    }
+
+    void XFunc::configure() {        
         funC::define_keywords();
         funC::define_builtins();
         funC::verbosity = 5;
@@ -53,9 +59,7 @@ namespace xfift {
                 global_sym_guard sym_guard(func_names);
                 funC::parse_source(&ss, &fd); 
             }
-            if (std::find(func_names.begin(), func_names.end(), "main") != func_names.end()
-                || func_names.empty()) 
-            {
+            if (std::find(func_names.begin(), func_names.end(), "main") != func_names.end()) {
                 script_fif = generate_fift_script();
             }
         } catch (src::Fatal& fatal) {
@@ -72,7 +76,7 @@ namespace xfift {
             XResult res = fift.do_interpret(script_fif);
             return res.code == 0 ? res.vm_result() : res;
         }
-        
+
         return XResult();
     }
 

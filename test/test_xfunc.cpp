@@ -17,3 +17,15 @@ TEST(XFuncTest, TryOut)
     ASSERT_EQ(0, res1.code);
     ASSERT_EQ("2", res1.output);
 }
+
+TEST(XFuncTest, AutoReturn)
+{
+    xfift::XFunc func;
+    func.configure();
+
+    auto res = func.do_interpret("int i = 42");
+    std::cout << res.evalue << std::endl;
+    std::clog << res.vmlog << std::endl;
+    ASSERT_EQ(0, res.code);
+    ASSERT_EQ("42", res.output);
+}

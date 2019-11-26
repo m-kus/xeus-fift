@@ -22,6 +22,7 @@ namespace xfift {
 
         nl::json data;
         data["text/html"] = ss.str();
+        data["text/plain"] = res.output;
         return std::move(data);
     }
 

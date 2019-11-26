@@ -80,6 +80,7 @@
         "*.in": "cpp",
         "filesystem": "cpp",
         "colab.ipynb": "json",
-        "cerrno": "cpp"
+        "cerrno": "cpp",
+        "*.inc": "cpp"
     }
 }

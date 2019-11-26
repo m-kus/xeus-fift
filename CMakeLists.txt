@@ -195,7 +195,7 @@ add_test(NAME "test" COMMAND test)
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
 
 # Install my_kernel
-install(TARGETS ${XFIFT_EXE}
+install(TARGETS ${XFIFT_EXE} ${XFUNC_EXE}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Configuration and data directories for jupyter and my_kernel
@@ -210,3 +210,7 @@ install(DIRECTORY ${MY_KERNELSPEC_DIR}
 # Copy Fift libraries
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/fift/lib/ 
         DESTINATION /usr/lib/fift)
+
+# # Copy FunC libraries
+# install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/smartcont/stdlib.fc 
+#         DESTINATION /usr/lib/func)
