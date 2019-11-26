@@ -2,15 +2,13 @@
 
 #include <regex>
 #include <unordered_map>
-
 #include <ton/crypto/func/func.h>
 
 #include "xutil.hpp"
 
 using namespace sym;
-using namespace xutil;
 
-namespace xfunc {
+namespace xfift {
 
     std::string generate_fift_script();
 
@@ -19,15 +17,12 @@ namespace xfunc {
     private:
 
         std::unordered_map<sym::sym_idx_t, sym::SymDef*> backup_;
-        std::vector<std::string> func_names_;
 
     public:
 
         global_sym_guard() = delete;
-        global_sym_guard(const std::string& expr);
+        global_sym_guard(const std::vector<std::string>& func_names);
         virtual ~global_sym_guard();
-
-        bool not_a_func() const;
     };
 
     class XFunc
@@ -38,8 +33,8 @@ namespace xfunc {
         virtual ~XFunc() {}
 
         void configure();
-        XResult do_parse(const std::string& expr);
-        XResult do_interpret();
+        XResult do_interpret(const std::string& expr);
         bool code_complete(const std::string& token, std::vector<std::string>& matches);
+        std::string code_inspect(const std::string& word);
     };
 }

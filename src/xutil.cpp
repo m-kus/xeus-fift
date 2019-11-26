@@ -2,7 +2,7 @@
 
 #include "xutil.hpp"
 
-namespace xutil {
+namespace xfift {
 
     std::string strip(const std::string& s) 
     {

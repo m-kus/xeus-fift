@@ -4,20 +4,16 @@
 
 TEST(XFuncTest, TryOut)
 {
-    xfunc::XFunc func;
+    xfift::XFunc func;
     func.configure();
 
-    auto res = func.do_parse("forall X -> () print(X a) impure asm \"s0 PRINT\";");
-    std::clog << res.evalue << std::endl;
-    ASSERT_EQ(0, res.code);
+    auto res0 = func.do_interpret("forall X -> () print(X a) impure asm \"s0 PRINT\";");
+    std::clog << res0.evalue << std::endl;
+    ASSERT_EQ(0, res0.code);
 
-    auto res2 = func.do_parse("int i = 2; print(i)");
-    std::cout << res2.evalue << "\n";
-    ASSERT_EQ(0, res2.code);
-
-    auto res3 = func.do_interpret();
-    std::clog << res3.evalue << std::endl;
-    std::clog << res3.vmlog << std::endl;
-    ASSERT_EQ(0, res3.code);
-    ASSERT_EQ("2", res3.output);
+    auto res1 = func.do_interpret("int i = 2; print(i)");
+    std::cout << res1.evalue << std::endl;
+    std::clog << res1.vmlog << std::endl;
+    ASSERT_EQ(0, res1.code);
+    ASSERT_EQ("2", res1.output);
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <experimental/filesystem>
-
 #include <td/utils/Parser.h>
 #include <ton/crypto/fift/Fift.h>
 #include <ton/crypto/fift/words.h>
@@ -13,7 +12,7 @@ using namespace fift;
 using namespace funC;
 using namespace src;
 
-namespace xutil {
+namespace xfift {
 
     std::string strip(const std::string& s);
     void split(std::string s, char delim, std::vector<std::string>& res);

@@ -1,6 +1,6 @@
 #include "xutil.hpp"
 
-namespace xutil {
+namespace xfift {
 
     XResult::XResult()
         : code(0) 

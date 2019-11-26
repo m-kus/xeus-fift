@@ -42,7 +42,7 @@ TEST(XFiftTest, SimpleComplete)
     fift.configure();
 
     std::string token;
-    auto token_pos = parse_token("\"Asm.fif\" inc", 13, token);
+    auto token_pos = xfift::parse_token("\"Asm.fif\" inc", 13, token);
     
     ASSERT_EQ("inc", token);
 
@@ -68,7 +68,7 @@ TEST(XFiftTest, EndLineInspect)
     fift.configure();
 
     std::string token;
-    auto token_pos = parse_token("four .s", 7, token);
+    auto token_pos = xfift::parse_token("four .s", 7, token);
 
     ASSERT_EQ(".s", token);
 }
@@ -79,7 +79,7 @@ TEST(XFiftTest, EndWordInspect)
     fift.configure();
 
     std::string token;
-    auto token_pos = parse_token("tuple ", 5, token);
+    auto token_pos = xfift::parse_token("tuple ", 5, token);
     
     ASSERT_EQ("tuple", token);
 }
@@ -90,7 +90,7 @@ TEST(XFiftTest, QuoteInspect)
     fift.configure();
 
     std::string token;
-    auto token_pos = parse_token("abort\"message\"", 2, token);
+    auto token_pos = xfift::parse_token("abort\"message\"", 2, token);
     
     ASSERT_EQ("abort", token);
 }

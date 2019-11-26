@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15.2)
 project(xeus-fift)
 
-set(XFIFT_EXE xeus-fift)
 set(BUILD_SHARED_LIBS NO CACHE BOOL "" FORCE)
 set(BUILD_STATIC_LIBS YES CACHE BOOL "" FORCE)
 
@@ -10,10 +9,17 @@ set(BUILD_STATIC_LIBS YES CACHE BOOL "" FORCE)
 
 include(GNUInstallDirs)
 
+set(XFIFT_EXE xeus-fift)
+set(XFUNC_EXE xeus-func)
+
 # We generate the kernel.json file, given the installation prefix and the executable name
 configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels/fift/kernel.json.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels/fift/kernel.json"
+)
+configure_file (
+    "${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels/func/kernel.json.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels/func/kernel.json"
 )
 
 # Dependencies
@@ -64,15 +70,13 @@ endif()
 # Target and link xeus-fift
 # =========================
 
-set(XFIFT_EXE xeus-fift)
 set(XFIFT_SRC 
     "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
-    "${CMAKE_SOURCE_DIR}/src/xfift/xinterpreter.cpp"
     "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
     "${CMAKE_SOURCE_DIR}/src/xutil.cpp"
 )
 
-add_executable(${XFIFT_EXE} src/xfift/main.cpp ${XFIFT_SRC})
+add_executable(${XFIFT_EXE} src/main.cpp ${XFIFT_SRC})
 include_directories(${XFIFT_EXE} PUBLIC
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/third-party
@@ -107,40 +111,46 @@ set_target_properties(${XFIFT_EXE} PROPERTIES
 # Target and link xeus-func
 # =========================
 
+set(XFUNC_SRC 
+    "${CMAKE_SOURCE_DIR}/src/xfunc/xfunc.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/symdef.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xutil.cpp"
+)
 
-# set(XFUNC_EXE xeus-func)
-# file(GLOB_RECURSE XFUNC_SRC "${CMAKE_SOURCE_DIR}/src/xfunc/*")
+add_executable(${XFUNC_EXE} src/main.cpp ${XFUNC_SRC})
+target_compile_definitions(${XFUNC_EXE} PUBLIC -DXFUNC_KERNEL)
+target_include_directories(${XFUNC_EXE} PUBLIC
+    ${CMAKE_SOURCE_DIR}/third-party
+    ${CMAKE_SOURCE_DIR}/third-party/xeus/include
+    ${CMAKE_SOURCE_DIR}/third-party/nlohmann_json/include
+    ${CMAKE_SOURCE_DIR}/third-party/libzmq/include
+    ${CMAKE_SOURCE_DIR}/third-party/xtl/include
+    ${CMAKE_SOURCE_DIR}/third-party/cppzmq
+)
+target_link_libraries(${XFUNC_EXE} PUBLIC 
+    libzmq-static
+    xeus_static 
+    fift-lib
+    func-lib
+    stdc++fs
+)
 
-# add_executable(${XFIFT_EXE} src/main.cpp ${XFIFT_SRC})
-# include_directories(${XFIFT_EXE} PUBLIC
-#     ${CMAKE_SOURCE_DIR}/third-party
-#     ${CMAKE_SOURCE_DIR}/third-party/xeus/include
-#     ${CMAKE_SOURCE_DIR}/third-party/nlohmann_json/include
-#     ${CMAKE_SOURCE_DIR}/third-party/libzmq/include
-#     ${CMAKE_SOURCE_DIR}/third-party/xtl/include
-#     ${CMAKE_SOURCE_DIR}/third-party/cppzmq
-# )
-# target_link_libraries(${XFIFT_EXE} PUBLIC 
-#     libzmq-static
-#     xeus_static 
-#     fift-lib
-#     stdc++fs
-# )
+if (APPLE)
+    set_target_properties(${XFUNC_EXE} PROPERTIES
+        MACOSX_RPATH ON
+    )
+else()
+    set_target_properties(${XFUNC_EXE} PROPERTIES
+        BUILD_WITH_INSTALL_RPATH 1
+        SKIP_BUILD_RPATH FALSE
+    )
+endif()
 
-# if (APPLE)
-#     set_target_properties(${XFIFT_EXE} PROPERTIES
-#         MACOSX_RPATH ON
-#     )
-# else()
-#     set_target_properties(${XFIFT_EXE} PROPERTIES
-#         BUILD_WITH_INSTALL_RPATH 1
-#         SKIP_BUILD_RPATH FALSE
-#     )
-# endif()
-
-# set_target_properties(${XFIFT_EXE} PROPERTIES
-#     INSTALL_RPATH_USE_LINK_PATH TRUE
-# )
+set_target_properties(${XFUNC_EXE} PROPERTIES
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
 
 
 # Testing
@@ -152,8 +162,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/googletest EXCLUDE_FROM_ALL)
 
 set(SRC_TESTS
     "${CMAKE_SOURCE_DIR}/src/xfunc/xfunc.cpp"
-    "${CMAKE_SOURCE_DIR}/src/xfunc/codegen.cpp"
-    "${CMAKE_SOURCE_DIR}/src/xfunc/symguard.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/symdef.cpp"
     "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
     "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
     "${CMAKE_SOURCE_DIR}/src/xutil.cpp"

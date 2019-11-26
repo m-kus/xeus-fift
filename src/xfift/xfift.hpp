@@ -7,7 +7,6 @@
 
 using namespace fift;
 using namespace vm;
-using namespace xutil;
 
 namespace xfift {
 

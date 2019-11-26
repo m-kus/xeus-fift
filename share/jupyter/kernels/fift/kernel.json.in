@@ -1,7 +1,7 @@
 {
   "display_name": "Fift",
   "argv": [
-    "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@EXECUTABLE_NAME@",
+    "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@/@XFIFT_EXE@",
     "-f",
     "{connection_file}"
   ],

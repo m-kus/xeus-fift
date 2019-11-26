@@ -5,7 +5,33 @@ using namespace xfift;
 using namespace funC;
 using namespace src;
 
-namespace xfunc {
+namespace xfift {
+
+    std::string parse_expression(const std::string& expr, std::vector<std::string>& func_names) {
+        std::regex func_name_re("\\s~?([_\\w]+)\??\\([_,\\w\\s]*\\)\\s?(?:[a-z]|\\{)");
+       
+        for (std::sregex_iterator it = std::sregex_iterator(expr.begin(), expr.end(), func_name_re);
+                                  it != std::sregex_iterator();
+                                ++it)
+        {
+            std::smatch match = *it;
+            assert(match.size() == 2);
+            func_names.push_back(match.str(1));
+        }
+
+        if (func_names.empty()) {
+            std::stringstream ss;
+            ss << "_ main() {\n" << expr;
+            std::size_t ending = expr.find_last_not_of(" \r\n\t");
+            if (ending != -1 && expr[ending] != ';') {
+                ss << ';';
+            }
+            ss << "\n}";
+            return ss.str();
+        } else {
+            return expr;
+        }
+    }
 
     void XFunc::configure() {
         funC::define_keywords();
@@ -13,24 +39,25 @@ namespace xfunc {
         funC::verbosity = 5;
     }
 
-    inline std::string format_main(const std::string& expr) {
-        std::stringstream ss;
-        ss << "_ main() {\n" << expr;
-        std::size_t ending = expr.find_last_not_of(" \r\n\t");
-        if (ending != -1 && expr[ending] != ';') {
-            ss << ';';
-        }
-        ss << "\n}";
-        return ss.str();
-    }
-
-    XResult XFunc::do_parse(const std::string& expr) {
-        global_sym_guard sym_guard(expr);
-        std::stringstream ss(sym_guard.not_a_func() ? format_main(expr) : expr);
+    XResult XFunc::do_interpret(const std::string& expr) {
+        std::vector<std::string> func_names;
+        std::string source = parse_expression(expr, func_names);
+        
+        std::stringstream ss(source);
         src::FileDescr fd{"stdin", true};
+        std::string script_fif;
 
-        try {
-            funC::parse_source(&ss, &fd);
+        try 
+        {
+            { 
+                global_sym_guard sym_guard(func_names);
+                funC::parse_source(&ss, &fd); 
+            }
+            if (std::find(func_names.begin(), func_names.end(), "main") != func_names.end()
+                || func_names.empty()) 
+            {
+                script_fif = generate_fift_script();
+            }
         } catch (src::Fatal& fatal) {
             return XResult(fatal);
         } catch (src::ParseError& error) {
@@ -39,31 +66,21 @@ namespace xfunc {
             return XResult(unif_err);
         }
 
-        return XResult();
-    }
-
-    XResult XFunc::do_interpret() {
-        XFift fift;
-        fift.configure();
-
-        try {
-            std::string script = generate_fift_script();
-            XResult res = fift.do_interpret(script);
-            if (res.code == 0) {
-                return res.vm_result();
-            } else {
-                return res;
-            }
-        } catch (src::Fatal& fatal) {
-            return XResult(fatal);
-        } catch (src::ParseError& error) {
-            return XResult(error);
+        if (!script_fif.empty()) {
+            XFift fift;
+            fift.configure();
+            XResult res = fift.do_interpret(script_fif);
+            return res.code == 0 ? res.vm_result() : res;
         }
-
+        
         return XResult();
     }
 
     bool XFunc::code_complete(const std::string& token, std::vector<std::string>& matches) {
         return false;
+    }
+
+    std::string XFunc::code_inspect(const std::string& word) {
+        return "";
     }
 }

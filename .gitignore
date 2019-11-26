@@ -1,5 +1,6 @@
 build/
 share/jupyter/kernels/fift/kernel.json
+share/jupyter/kernels/func/kernel.json
 .ipynb_checkpoints
 .idea/
 __pycache__/
