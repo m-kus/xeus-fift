@@ -27,7 +27,8 @@ namespace xfift {
 
         void configure();
         XResult do_interpret(const std::string& expr);
-        bool code_complete(const std::string& token, std::vector<std::string>& matches);
-        std::string code_inspect(const std::string& word);      
+        XToken parse_token(const std::string& line, std::size_t cursor_pos);  
+        bool code_complete(const XToken& token, std::vector<std::string>& matches);
+        std::string code_inspect(const XToken& token);
     };
 }

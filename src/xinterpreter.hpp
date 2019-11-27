@@ -40,6 +40,7 @@ namespace xfift {
         nl::json is_complete_request_impl(const std::string&) override;
         nl::json kernel_info_request_impl() override;
         void shutdown_request_impl() override;
+
     };
 
     template<typename XInt>
@@ -82,15 +83,13 @@ namespace xfift {
         int cursor_pos)
     {
         nl::json kernel_res;
-        std::string token;
+        XToken token = int_.parse_token(code, cursor_pos);
+
         std::vector<std::string> matches;
-
-        auto token_pos = parse_token(code, cursor_pos, token);
-
         if (int_.code_complete(token, matches)) {
             kernel_res["matches"] = matches;
-            kernel_res["cursor_start"] = token[0] == '"' ? token_pos.first + 1 : token_pos.first;
-            kernel_res["cursor_end"] = token_pos.second;
+            kernel_res["cursor_start"] = token.begin_pos;
+            kernel_res["cursor_end"] = token.end_pos;
         } else {
             kernel_res["matches"] = nl::json::array();
             kernel_res["cursor_start"] = cursor_pos;
@@ -108,11 +107,9 @@ namespace xfift {
         int detail_level)
     {
         nl::json kernel_res;
-        std::string token;
-
-        parse_token(code, cursor_pos, token);
+        XToken token = int_.parse_token(code, cursor_pos, token);
+  
         std::string docstring = int_.code_inspect(token);
-
         if (!docstring.empty()) {
             kernel_res["found"] = true;
             kernel_res["data"]["text/plain"] = docstring;

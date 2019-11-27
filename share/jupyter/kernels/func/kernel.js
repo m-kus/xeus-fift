@@ -16,10 +16,6 @@ define([
                 // fallback
                 { regex: /[^\s]+/, token: "variable"},
             ],
-            // The meta property contains global information about the mode. It
-            // can contain properties like lineComment, which are supported by
-            // all modes, and also directives like dontIndentStates, which are
-            // specific to simple modes.
             meta: {
                 dontIndentStates: ["comment"],
                 lineComment: ";;",

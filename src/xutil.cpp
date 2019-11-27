@@ -27,22 +27,6 @@ namespace xfift {
         }
     }
 
-    token_pos parse_token(const std::string& line, std::size_t cursor_pos, std::string& res) 
-    {
-        auto token_begin = line.find_last_of(' ', cursor_pos > 0 ? cursor_pos - 1 : 0);
-        if (token_begin == std::string::npos) {
-            token_begin = 0;
-        } else {
-            token_begin++;
-        }
-        auto token_end = line.find_first_of(" \"", cursor_pos); 
-        if (token_end == std::string::npos) {
-            token_end = line.size();
-        }
-        res = line.substr(token_begin, token_end - token_begin);
-        return std::make_pair(token_begin, token_end);
-    }
-
     std::string html_escape(const std::string& data) 
     {
         std::string buffer;
@@ -85,6 +69,39 @@ namespace xfift {
         return matches.size();
     }
 
+    std::string XToken::str() const {
+        return line.substr(begin_pos, end_pos - begin_pos);
+    }
+
+    char XToken::prev_char() const {
+        return begin_pos > 0 ? line[begin_pos - 1] : 0;
+    }
+
+    char XToken::next_char() const {
+        return end_pos < line.size() ? line[end_pos] : 0;
+    }
+
+    XToken parse_token(
+        const std::string& line, 
+        std::size_t cursor_pos,
+        const std::string& look_behind_chars,
+        const std::string& look_ahead_chars) 
+    {
+        XToken token{};
+        token.line = line;
+        token.begin_pos = line.find_last_of(look_behind_chars, cursor_pos > 0 ? cursor_pos - 1 : 0);
+        if (token.begin_pos == std::string::npos) {
+            token.begin_pos = 0;
+        } else {
+            token.begin_pos++;
+        }
+        token.end_pos = line.find_first_of(look_ahead_chars, cursor_pos); 
+        if (token.end_pos == std::string::npos) {
+            token.end_pos = line.size();
+        }
+        return std::move(token);
+    }
+
     XResult XResult::vm_result() {
         std::regex vm_output_re("^(.+)\\s([0-9]{1,2})\\s\\n$");
         std::smatch match;
@@ -95,15 +112,17 @@ namespace xfift {
             XResult res;
             res.code = std::stoi(match.str(2));
             res.output = match.str(1);
-            res.vmlog = vmlog;
 
             if (res.code != 0) {
+                res.vmlog = vmlog;
                 res.ename = "VM error";
+
                 if (res.code < (int)vm::Excno::total) {
                     res.evalue = vm::get_exception_msg(static_cast<vm::Excno>(res.code));
                 } else {
                     res.evalue = "unknown code " + match.str(2);
                 }
+                
                 res.traceback.push_back(res.ename + ": " + res.evalue);
                 for (auto& row : traceback) {
                     res.traceback.push_back(row);

@@ -16,12 +16,34 @@ namespace xfift {
 
     std::string strip(const std::string& s);
     void split(std::string s, char delim, std::vector<std::string>& res);
-
-    using token_pos = std::pair<std::size_t, std::size_t>;
-    token_pos parse_token(const std::string& line, std::size_t cursor_pos, std::string& res);
-
     std::string html_escape(const std::string& data);
     std::size_t path_complete(const fs::path& path, std::vector<std::string>& matches);
+
+    struct XToken
+    {
+        std::string line;
+        std::size_t begin_pos;
+        std::size_t end_pos;
+
+        std::string str() const;
+        char prev_char() const;
+        char next_char() const;
+
+        XToken() = default;
+        XToken(const char* token)
+            : line(token)
+            , begin_pos(0)
+            , end_pos(line.size())
+        {            
+        }
+    };
+
+    XToken parse_token(
+        const std::string& line, 
+        std::size_t cursor_pos,
+        const std::string& look_behind_chars,
+        const std::string& look_ahead_chars
+    );
 
     struct XResult
     {

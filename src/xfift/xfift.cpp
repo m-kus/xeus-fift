@@ -74,10 +74,15 @@ namespace xfift {
         return std::move(res);
     }
 
-    bool XFift::code_complete(const std::string& token, std::vector<std::string>& matches)
+    XToken XFift::parse_token(const std::string& line, std::size_t cursor_pos) {
+        return std::move(xfift::parse_token(line, cursor_pos, " \"", " \""));
+    }
+
+    bool XFift::code_complete(const XToken& token, std::vector<std::string>& matches)
     {
-        if (!token.empty() && token[0] == '"') {
-            fs::path p{token.substr(1)};
+        std::string prefix = token.str();
+        if (!prefix.empty() && token.prev_char() == '"') {
+            fs::path p{prefix};
             if (p.has_parent_path()) {
                 path_complete(p, matches);
             } else {
@@ -87,17 +92,16 @@ namespace xfift {
             }
         } else {
             std::for_each(dictionary_.begin(), dictionary_.end(), [&](const std::pair<std::string, WordRef>& x) {
-                if (token.empty() || std::equal(token.begin(), token.end(), x.first.begin())) {
+                if (prefix.empty() || std::equal(prefix.begin(), prefix.end(), x.first.begin())) {
                     matches.push_back(strip(x.first));
                 }
             });
         }
-
         return !matches.empty(); 
     }
 
-    std::string XFift::code_inspect(const std::string& word) 
+    std::string XFift::code_inspect(const XToken& token) 
     {
-        return get_docstring(word);
+        return get_docstring(token.str());
     }
 }
