@@ -20,11 +20,11 @@ namespace xfift {
         "return", "var", "repeat", "do", "while", "until", "if", "ifnot", "then", "else", "elseif", "elseifnot",
         "extern", "asm", "impure", "inline", "inline_ref", "method_id", "operator", "infix", "infixl", "infixr",
         // builtins
-        "divmod ", "moddiv ", "muldivr ", "muldiv ", "muldivmod ", "null? ", "throw ", "throw_if ", "throw_unless ", 
-        "load_int ", "load_uint ", "preload_int ", "preload_uint ", "store_int ", "store_uint ", "load_bits ", 
-        "preload_bits ", "int_at", "cell_at ", "slice_at ", "tuple_at ", "at ", "touch ", "touch2 ", "dump ", 
-        "run_method0 ", "run_method1 ", "run_method2 ", "run_method3", "~divmod ", "~moddiv ", "~store_int ", 
-        "~store_uint ", "~touch ", "~touch2"
+        "divmod", "moddiv", "muldivr", "muldiv", "muldivmod", "null?", "throw", "throw_if", "throw_unless", 
+        "load_int", "load_uint", "preload_int", "preload_uint", "store_int", "store_uint", "load_bits", 
+        "preload_bits", "int_at", "cell_at", "slice_at", "tuple_at", "at", "touch", "touch2", "dump", 
+        "run_method0", "run_method1", "run_method2", "run_method3", "~divmod", "~moddiv", "~store_int", 
+        "~store_uint", "~touch", "~touch2"
     };
 
     XFunc::XFunc()
@@ -137,7 +137,7 @@ namespace xfift {
     }
 
     XToken XFunc::code_inspect(const std::string& expr, std::size_t cursor_pos, std::string& tooltip) {
-        XToken token = parse_token(expr, cursor_pos, "\n~.;=><( ", "\n() ");
+        XToken token = parse_token(expr, cursor_pos, "\n~.;=><(", "\n() ");
         if (token.prev_char() == '~') {
             token.begin_pos--;
         }

@@ -1,5 +1,3 @@
-#include <regex>
-
 #include "xutil.hpp"
 
 namespace xfift {
@@ -105,38 +103,5 @@ namespace xfift {
             token.end_pos = line.size();
         }
         return std::move(token);
-    }
-
-    XResult XResult::vm_result() {
-        std::regex vm_output_re("^(.+)\\s([0-9]{1,2})\\s\\n$");
-        std::smatch match;
-
-        if (std::regex_match(output, match, vm_output_re)) {
-            assert(match.size() == 3);
-            
-            XResult res;
-            res.code = std::stoi(match.str(2));
-            res.output = match.str(1);
-
-            if (res.code != 0) {
-                res.vmlog = vmlog;
-                res.ename = "VM error";
-
-                if (res.code < (int)vm::Excno::total) {
-                    res.evalue = vm::get_exception_msg(static_cast<vm::Excno>(res.code));
-                } else {
-                    res.evalue = "unknown code " + match.str(2);
-                }
-                
-                res.traceback.push_back(res.ename + ": " + res.evalue);
-                for (auto& row : traceback) {
-                    res.traceback.push_back(row);
-                }
-            }
-            
-            return res;
-        } else {
-            return *this;
-        }
     }
 }

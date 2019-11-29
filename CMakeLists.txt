@@ -90,6 +90,7 @@ target_link_libraries(${XFIFT_EXE} PUBLIC
     libzmq-static
     xeus_static 
     fift-lib
+    func-lib
     stdc++fs
 )
 

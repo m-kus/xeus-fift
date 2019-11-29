@@ -52,7 +52,7 @@ define([
         var blockKeywordsStr = "repeat do if ifnot then else elseif elseifnot";
         var blockKeywords = words(blockKeywordsStr);
         var types = words("int cell slice builder cont tuple _");
-        var keywords = words("#include var return while until forall type " + blockKeywordsStr);
+        var keywords = words("#include print var return while until forall type " + blockKeywordsStr);
         var modifiers = words("extern asm impure inline inline_ref method_id operator infix infixl infixr");
         var atoms = words("true false nil Nil main");
         var builtins = words("divmod moddiv muldivr muldiv muldivmod null? throw throw_if throw_unless load_int " + 

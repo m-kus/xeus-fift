@@ -14,9 +14,7 @@ namespace xfift {
                     || op.cl == funC::Op::_Let
                     || op.cl == funC::Op::_GlobVar)
                 {
-                    for (const auto& var : op.left) {
-                        op.next->left.push_back(var);
-                    }
+                    std::copy(op.left.begin(), op.left.end(), std::back_inserter(op.next->left));
                 }
                 return;
             }

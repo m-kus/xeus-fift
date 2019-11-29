@@ -4,16 +4,62 @@
 [![made_with xeus](https://img.shields.io/badge/made_with-xeus-yellowgreen.svg)](https://github.com/QuantStack/xeus)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Jupyter kernel for the Fift language (and TVM assembler)
+Jupyter kernels for the Fift and FunC languages (and TVM assembler) 
 
 ![Xeus-Fift](https://i.imgur.com/0UtNcmL.gif)
 
 ## Features
+
+### Fift kernel
 Aside from the convenient Jupyter interactive workflow this kernel provides:
 
 * Syntax highlighting
 * Words autocomplete via `Tab` (including those which are included or defined by you)
 * In-place docstrings via `Shift+Tab` (for words defined in FiftBase and TVM pdf files)
+
+### FunC kernel
+* Syntax highlighting including (non)const methods and pseudo-namespaces
+* Autoindentation
+* Autocomplete by keywords and global functions
+* Inspect function signature by `Shift+Tab`        
+* Extra: `#include` macro and `print` debug helper
+
+## FunC Workflow
+1. At the top-level of each cell you can use `#include "path/to/file"` macro to load functions from a `.fc` file. They will be available throughout the notebook.
+2. You can define multiple functions in any cell, they will also be available from everywhere.
+3. At the end of the cell (using separate cell is recommended) you can write piece of code not wrapped by a function definition. It will be automatically used as `main` body. Such code cannot be accessed from another cell.
+4. Alternatively, you can specify `main` function explicitly.
+5. You can omit `return` and trailing `;` in the main code block - they will be added during the execution.
+6. Note, that every time you re-run a cell, all functions defined in this cell are being overwritten.
+
+### Examples
+Return constant
+```
+<<< 2 + 2
+>>> 4
+```
+
+Return variable
+```
+<<< int i = 42
+>>> 42
+```
+
+Return function result
+```
+<<< int sum(int a, int b) { return a + b; }
+... sum(2, 2)
+>>> 4
+```
+
+Print variables
+```
+<<< int i = 1;
+... int j = 2;
+... print(i);
+... print(j);
+>>> 2 1
+```
 
 ## How to use
 
@@ -32,7 +78,7 @@ docker run --rm -it -p 127.0.0.1:8888:8888 -v $(pwd):/home/jupyter/notebooks ato
 wget https://github.com/atomex-me/xeus-fift/releases/download/0.1.0/xeus-fift_0.1.0-1_amd64.deb -P /tmp/
 sudo dpkg -i /tmp/xeus-fift_0.1.0-1_amd64.deb
 ```
-3. Check that Jupyter is now supporting the Fift kernel
+3. Check that Jupyter is now supporting Fift and FunC kernels
 ```
 jupyter kernelspec list
 ```
@@ -49,7 +95,7 @@ cmake ..
 make xeus-fift
 sudo make install
 ```
-3. Check that Jupyter is now supporting the Fift kernel
+3. Check that Jupyter is now supporting Fift and FunC kernels
 ```
 jupyter kernelspec list
 ```
