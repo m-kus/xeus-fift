@@ -31,7 +31,7 @@ define([
         }
         return state.context = state.context.prev;
     }
-       
+
     function words(str) {
         var obj = {}, words = str.split(" ");
         for (var i = 0; i < words.length; ++i) {
@@ -123,7 +123,7 @@ define([
             }
             return "variable";
         }
-      
+
         function tokenString(quote) {
             return function(stream, state) {
                 var escaped = false, next, end = false;
@@ -154,7 +154,7 @@ define([
                 return style;
             }
         }
-      
+
         function startState(basecolumn) {
             return {
               tokenize: null,
@@ -250,7 +250,7 @@ define([
             }
             return ctx.indented + (closing ? 0 : indentUnit);
         }
-      
+
         return {
             startState: startState,
             token: token,
@@ -260,7 +260,7 @@ define([
             fold: "brace"
         };
     }
-  
+
     var onload = function() {
         CodeMirror.defineMode("func", funcMode);
         CodeMirror.defineMIME("text/x-func", "func");

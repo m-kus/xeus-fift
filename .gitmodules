@@ -12,7 +12,7 @@
 	url = https://github.com/QuantStack/xeus.git
 [submodule "third-party/ton"]
 	path = third-party/ton
-	url = https://github.com/ton-blockchain/ton.git
+	url = https://github.com/m-kus/ton.git
 [submodule "third-party/nlohmann_json"]
 	path = third-party/nlohmann_json
 	url = https://github.com/nlohmann/json.git
