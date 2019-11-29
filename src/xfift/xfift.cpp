@@ -14,7 +14,7 @@ namespace xfift {
         ctx_.dictionary = &dictionary_;
         ctx_.source_lookup = &source_lookup_;
         ctx_.include_depth = 1;
-        ctx_.filename = 'stdin';
+        ctx_.filename = "stdin";
     }
 
     XFift::~XFift() 
@@ -74,13 +74,11 @@ namespace xfift {
         return std::move(res);
     }
 
-    XToken XFift::parse_token(const std::string& line, std::size_t cursor_pos) {
-        return std::move(xfift::parse_token(line, cursor_pos, " \"", " \""));
-    }
-
-    bool XFift::code_complete(const XToken& token, std::vector<std::string>& matches)
+    XToken XFift::code_complete(const std::string& expr, std::size_t cursor_pos, std::vector<std::string>& matches)
     {
+        XToken token = parse_token(expr, cursor_pos, " \"", " \"");
         std::string prefix = token.str();
+
         if (!prefix.empty() && token.prev_char() == '"') {
             fs::path p{prefix};
             if (p.has_parent_path()) {
@@ -97,11 +95,13 @@ namespace xfift {
                 }
             });
         }
-        return !matches.empty(); 
+        return std::move(token); 
     }
 
-    std::string XFift::code_inspect(const XToken& token) 
+    XToken XFift::code_inspect(const std::string& expr, std::size_t cursor_pos, std::string& tooltip) 
     {
-        return get_docstring(token.str());
+        XToken token = parse_token(expr, cursor_pos, " \"", " \"");
+        tooltip = get_docstring(token.str());
+        return std::move(token);
     }
 }

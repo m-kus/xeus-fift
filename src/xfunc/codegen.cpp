@@ -4,16 +4,15 @@ namespace xfift {
 
     void force_return(funC::CodeBlob* code) {
         for (auto& op : code->ops) {
-            if (op.next
-                && op.next->cl == funC::Op::_Return
-                && op.next->left.empty()
-                && op.next->next
-                && op.next->next->cl == funC::Op::_Nop
+            if (op.next && op.next->cl == funC::Op::_Return && op.next->left.empty()
+                && op.next->next && op.next->next->cl == funC::Op::_Nop
                 && op.next->next->next == nullptr)
             {
-                if ((op.cl == funC::Op::_Call && op.is_pure())
+                if (op.cl == funC::Op::_Call 
+                    || op.cl == funC::Op::_CallInd
                     || op.cl == funC::Op::_IntConst
-                    || op.cl == funC::Op::_Let)
+                    || op.cl == funC::Op::_Let
+                    || op.cl == funC::Op::_GlobVar)
                 {
                     for (const auto& var : op.left) {
                         op.next->left.push_back(var);

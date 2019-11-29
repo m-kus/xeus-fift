@@ -77,8 +77,8 @@ set(XFIFT_SRC
 )
 
 add_executable(${XFIFT_EXE} src/main.cpp ${XFIFT_SRC})
-include_directories(${XFIFT_EXE} PUBLIC
-    ${CMAKE_SOURCE_DIR}/src
+include_directories(${XFIFT_EXE} PUBLIC ${CMAKE_SOURCE_DIR}/src)
+include_directories(${XFIFT_EXE} SYSTEM PUBLIC
     ${CMAKE_SOURCE_DIR}/third-party
     ${CMAKE_SOURCE_DIR}/third-party/xeus/include
     ${CMAKE_SOURCE_DIR}/third-party/nlohmann_json/include
@@ -123,7 +123,7 @@ set(XFUNC_SRC
 
 add_executable(${XFUNC_EXE} src/main.cpp ${XFUNC_SRC})
 target_compile_definitions(${XFUNC_EXE} PUBLIC -DXFUNC_KERNEL)
-target_include_directories(${XFUNC_EXE} PUBLIC
+target_include_directories(${XFUNC_EXE} SYSTEM PUBLIC
     ${CMAKE_SOURCE_DIR}/third-party
     ${CMAKE_SOURCE_DIR}/third-party/xeus/include
     ${CMAKE_SOURCE_DIR}/third-party/nlohmann_json/include
@@ -215,6 +215,6 @@ install(DIRECTORY ${MY_KERNELSPEC_DIR}
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/fift/lib/ 
         DESTINATION /usr/lib/fift)
 
-# # Copy FunC libraries
-# install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/smartcont/stdlib.fc 
-#         DESTINATION /usr/lib/func)
+ # Copy FunC libraries
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/smartcont/stdlib.fc 
+        DESTINATION /usr/lib/func)

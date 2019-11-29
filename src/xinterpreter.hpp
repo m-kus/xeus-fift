@@ -83,10 +83,11 @@ namespace xfift {
         int cursor_pos)
     {
         nl::json kernel_res;
-        XToken token = int_.parse_token(code, cursor_pos);
 
         std::vector<std::string> matches;
-        if (int_.code_complete(token, matches)) {
+        XToken token = int_.code_complete(code, cursor_pos, matches)
+
+        if (!matches.empty()) {
             kernel_res["matches"] = matches;
             kernel_res["cursor_start"] = token.begin_pos;
             kernel_res["cursor_end"] = token.end_pos;
@@ -107,12 +108,13 @@ namespace xfift {
         int detail_level)
     {
         nl::json kernel_res;
-        XToken token = int_.parse_token(code, cursor_pos, token);
   
-        std::string docstring = int_.code_inspect(token);
-        if (!docstring.empty()) {
+        std::string tooltip;
+        int_.code_inspect(code, cursor_pos, tooltip);
+        
+        if (!tooltip.empty()) {
             kernel_res["found"] = true;
-            kernel_res["data"]["text/plain"] = docstring;
+            kernel_res["data"]["text/plain"] = tooltip;
         } else {
             kernel_res["found"] = false;
         }
@@ -159,13 +161,14 @@ namespace xfift {
     nl::json interpreter<XFunc>::kernel_info_request_impl()
     {
         nl::json kernel_res;
-        kernel_res["implementation"] = "xeus-fift";
+        kernel_res["implementation"] = "xeus-func";
         kernel_res["implementation_version"] = XEUS_FIFT_VERSION;
         kernel_res["language_info"]["name"] = "func";
         kernel_res["language_info"]["version"] = "0.5";
         kernel_res["language_info"]["mimetype"] = "text/x-func";
-        kernel_res["language_info"]["codemirror_mode"] = "func";
+        kernel_res["language_info"]["codemirror_mode"] = "clike";
         kernel_res["language_info"]["file_extension"] = ".fc";
+
         return kernel_res;
     }
 }

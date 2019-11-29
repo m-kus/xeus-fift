@@ -12,7 +12,8 @@ namespace xfift {
 
     void reset_global_state();
     void resolve_includes(std::string& expr);
-    void parse_expression(std::string& expr, std::vector<std::string>& func_names);
+    void parse_functions(const std::string& expr, std::vector<std::string>& func_names);
+    void force_main(std::string& expr, std::vector<std::string>& func_names);
     std::string generate_fift_script();
 
     class global_sym_guard
@@ -41,8 +42,7 @@ namespace xfift {
 
         void configure();
         XResult do_interpret(const std::string& expr);
-        XToken parse_token(const std::string& line, std::size_t cursor_pos);
-        bool code_complete(const XToken& token, std::vector<std::string>& matches);
-        std::string code_inspect(const XToken& token);
+        XToken code_complete(const std::string& expr, std::size_t cursor_pos, std::vector<std::string>& matches);
+        XToken code_inspect(const std::string& expr, std::size_t cursor_pos, std::string& tooltip);
     };
 }

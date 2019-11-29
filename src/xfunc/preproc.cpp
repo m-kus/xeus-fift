@@ -5,6 +5,10 @@
 
 namespace xfift {
 
+    const std::vector<std::string> not_a_func = {
+        "asm", "if", "ifnot", "then", "else", "elseif", "elseifnot"
+    };
+
     void resolve_includes(std::string& expr) {
         std::regex include_re("^#include\\s\"([^\"]+)\"");
         std::smatch match;
@@ -29,7 +33,7 @@ namespace xfift {
         }
     }
 
-    void parse_expression(std::string& expr, std::vector<std::string>& func_names) {
+    void parse_functions(const std::string& expr, std::vector<std::string>& func_names) {
         std::regex func_name_re("\\s~?([_\\w:#]+)\??\\s*\\([_,\\w\\s]*\\)\\s*(?:[a-z]|\\{)");
        
         for (std::sregex_iterator it = std::sregex_iterator(expr.begin(), expr.end(), func_name_re);
@@ -38,17 +42,20 @@ namespace xfift {
         {
             std::smatch match = *it;
             assert(match.size() == 2);
-            // TODO: exclude keywords
-            func_names.push_back(match.str(1));
+            if (std::find(not_a_func.begin(), not_a_func.end(), match.str(1)) == not_a_func.end()) {
+                func_names.push_back(match.str(1));
+            }
         }
+    }
 
+    void force_main(std::string& expr, std::vector<std::string>& func_names) {
         if (func_names.empty()) {
             func_names.push_back("main");
 
             std::stringstream ss;
             ss << "_ main() {\n" << expr;
             std::size_t ending = expr.find_last_not_of(" \r\n\t");
-            if (ending != -1 && expr[ending] != ';') {
+            if (ending != std::string::npos && expr[ending] != ';') {
                 ss << ';';
             }
             ss << "\n}";

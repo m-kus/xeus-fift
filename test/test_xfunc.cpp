@@ -7,11 +7,11 @@ TEST(XFuncTest, TryOut)
     xfift::XFunc func;
     func.configure();
 
-    auto res0 = func.do_interpret("forall X -> () print(X a) impure asm \"s0 PRINT\";");
+    auto res0 = func.do_interpret("forall X -> () test_print(X a) impure asm \"s0 PRINT\";");
     std::clog << res0.evalue << std::endl;
     ASSERT_EQ(0, res0.code);
 
-    auto res1 = func.do_interpret("int i = 2; print(i)");
+    auto res1 = func.do_interpret("int i = 2; test_print(i)");
     std::cout << res1.evalue << std::endl;
     std::clog << res1.vmlog << std::endl;
     ASSERT_EQ(0, res1.code);
@@ -28,4 +28,15 @@ TEST(XFuncTest, AutoReturn)
     std::clog << res.vmlog << std::endl;
     ASSERT_EQ(0, res.code);
     ASSERT_EQ("42", res.output);
+}
+
+TEST(XFuncTest, CodeInspect)
+{
+    xfift::XFunc func;
+    func.configure();
+
+    std::string tooltip;
+    func.code_inspect("print(", 6, tooltip);
+
+    std::cout << "print: " << tooltip << std::endl;
 }
