@@ -166,9 +166,8 @@ namespace xfift {
         kernel_res["language_info"]["name"] = "func";
         kernel_res["language_info"]["version"] = "0.5";
         kernel_res["language_info"]["mimetype"] = "text/x-func";
-        kernel_res["language_info"]["codemirror_mode"] = "clike";
+        kernel_res["language_info"]["codemirror_mode"] = "func";
         kernel_res["language_info"]["file_extension"] = ".fc";
-
         return kernel_res;
     }
 }
