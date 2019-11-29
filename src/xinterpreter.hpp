@@ -56,7 +56,7 @@ namespace xfift {
         bool silent,
         bool /*store_history*/,
         nl::json /*user_expressions*/,
-        bool allow_stdin)
+        bool /* allow_stdin */)
     {
         nl::json kernel_res;
 
@@ -85,7 +85,7 @@ namespace xfift {
         nl::json kernel_res;
 
         std::vector<std::string> matches;
-        XToken token = int_.code_complete(code, cursor_pos, matches)
+        XToken token = int_.code_complete(code, cursor_pos, matches);
 
         if (!matches.empty()) {
             kernel_res["matches"] = matches;
@@ -105,13 +105,13 @@ namespace xfift {
     nl::json interpreter<XInt>::inspect_request_impl(
         const std::string& code,
         int cursor_pos,
-        int detail_level)
+        int /* detail_level */  )
     {
         nl::json kernel_res;
   
         std::string tooltip;
         int_.code_inspect(code, cursor_pos, tooltip);
-        
+
         if (!tooltip.empty()) {
             kernel_res["found"] = true;
             kernel_res["data"]["text/plain"] = tooltip;

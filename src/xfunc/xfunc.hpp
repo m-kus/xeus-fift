@@ -1,6 +1,7 @@
 #pragma once
 
 #include <regex>
+#include <unordered_set>
 #include <unordered_map>
 #include <ton/crypto/func/func.h>
 
@@ -34,10 +35,11 @@ namespace xfift {
     private:
 
         std::vector<std::string> func_path_;
+        std::unordered_set<std::string> completion_;
 
     public:
 
-        XFunc() {}
+        XFunc();
         virtual ~XFunc();
 
         void configure();

@@ -34,7 +34,7 @@ namespace xfift {
     }
 
     void parse_functions(const std::string& expr, std::vector<std::string>& func_names) {
-        std::regex func_name_re("\\s~?([_\\w:#]+)\??\\s*\\([_,\\w\\s]*\\)\\s*(?:[a-z]|\\{)");
+        std::regex func_name_re("\\s(~?[_\\w:#]+[?=]?) *\\([_,\\w\\s]*\\) *(?:[a-z]|\\{)");
        
         for (std::sregex_iterator it = std::sregex_iterator(expr.begin(), expr.end(), func_name_re);
                                   it != std::sregex_iterator();

@@ -35,8 +35,10 @@ TEST(XFuncTest, CodeInspect)
     xfift::XFunc func;
     func.configure();
 
-    std::string tooltip;
-    func.code_inspect("print(", 6, tooltip);
+    auto res = func.do_interpret("int sum(int a, int b) { return a + b; }");
+    ASSERT_EQ(0, res.code);
 
-    std::cout << "print: " << tooltip << std::endl;
+    std::string tooltip;
+    func.code_inspect("if (sum(2, 2))", 6, tooltip);
+    ASSERT_FALSE(tooltip.empty());
 }

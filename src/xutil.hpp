@@ -41,8 +41,8 @@ namespace xfift {
     XToken parse_token(
         const std::string& line, 
         std::size_t cursor_pos,
-        const std::string& look_behind_chars,
-        const std::string& look_ahead_chars
+        const char* look_behind_chars,
+        const char* look_ahead_chars
     );
 
     struct XResult

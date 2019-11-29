@@ -84,16 +84,21 @@ namespace xfift {
     XToken parse_token(
         const std::string& line, 
         std::size_t cursor_pos,
-        const std::string& look_behind_chars,
-        const std::string& look_ahead_chars) 
+        const char* look_behind_chars,
+        const char* look_ahead_chars) 
     {
         XToken token{};
         token.line = line;
-        token.begin_pos = line.find_last_of(look_behind_chars, cursor_pos > 0 ? cursor_pos - 1 : 0);
-        if (token.begin_pos == std::string::npos) {
+
+        if (cursor_pos == 0) {
             token.begin_pos = 0;
         } else {
-            token.begin_pos++;
+            token.begin_pos = line.find_last_of(look_behind_chars, cursor_pos > 0 ? cursor_pos - 1 : 0);
+            if (token.begin_pos == std::string::npos) {
+                token.begin_pos = 0;
+            } else {
+                token.begin_pos++;
+            }
         }
         token.end_pos = line.find_first_of(look_ahead_chars, cursor_pos); 
         if (token.end_pos == std::string::npos) {
