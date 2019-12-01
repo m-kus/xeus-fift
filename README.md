@@ -20,7 +20,7 @@ Aside from the convenient Jupyter interactive workflow this kernel provides:
 ### FunC kernel
 * Syntax highlighting including (non)const methods and pseudo-namespaces
 * Autoindentation
-* Autocomplete by keywords and global functions
+* Autocomplete by `Tab` using keywords and global functions
 * Inspect function signature by `Shift+Tab`        
 * Extra: `#include` macro and `print` debug helper
 
@@ -34,26 +34,26 @@ Aside from the convenient Jupyter interactive workflow this kernel provides:
 
 ### Examples
 Return constant
-```
+```cpp
 <<< 2 + 2
 >>> 4
 ```
 
 Return variable
-```
+```cpp
 <<< int i = 42
 >>> 42
 ```
 
 Return function result
-```
+```cpp
 <<< int sum(int a, int b) { return a + b; }
 ... sum(2, 2)
 >>> 4
 ```
 
 Print variables
-```
+```cpp
 <<< int i = 1;
 ... int j = 2;
 ... print(i);
@@ -64,6 +64,10 @@ Print variables
 ## How to use
 
 ### Run in docker
+0. Get the latest image from dockerhub (only when new releases are published)
+```
+docker pull atomex/xeus-fift
+```
 1. Create container using verified docker image:
 ```
 docker run --rm -it -p 127.0.0.1:8888:8888 -v $(pwd):/home/jupyter/notebooks atomex/xeus-fift
