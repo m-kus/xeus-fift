@@ -79,6 +79,8 @@
         "fft": "cpp",
         "*.in": "cpp",
         "filesystem": "cpp",
-        "colab.ipynb": "json"
+        "colab.ipynb": "json",
+        "cerrno": "cpp",
+        "*.inc": "cpp"
     }
 }

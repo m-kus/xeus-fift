@@ -1,13 +1,8 @@
-#pragma once
+#include "xutil.hpp"
 
-#include <experimental/filesystem>
-#include <td/utils/Parser.h>
+namespace xfift {
 
-namespace fs = std::experimental::filesystem;
-
-namespace str {
-
-    static inline std::string strip(const std::string& s) 
+    std::string strip(const std::string& s) 
     {
         if (s.empty()) {
             return s;
@@ -18,7 +13,7 @@ namespace str {
         return std::move(s.substr(first, last - first + 1));
     }
 
-    static inline void split(std::string s, char delim, std::vector<std::string>& res) 
+    void split(std::string s, char delim, std::vector<std::string>& res) 
     {
         td::Parser parser(s);
         while (!parser.empty()) {
@@ -30,24 +25,7 @@ namespace str {
         }
     }
 
-    using token_pos = std::pair<std::size_t, std::size_t>;
-    static inline token_pos parse_token(const std::string& line, std::size_t cursor_pos, std::string& res) 
-    {
-        auto token_begin = line.find_last_of(' ', cursor_pos > 0 ? cursor_pos - 1 : 0);
-        if (token_begin == std::string::npos) {
-            token_begin = 0;
-        } else {
-            token_begin++;
-        }
-        auto token_end = line.find_first_of(" \"", cursor_pos); 
-        if (token_end == std::string::npos) {
-            token_end = line.size();
-        }
-        res = line.substr(token_begin, token_end - token_begin);
-        return std::make_pair(token_begin, token_end);
-    }
-
-    static inline std::string html_escape(const std::string& data) 
+    std::string html_escape(const std::string& data) 
     {
         std::string buffer;
         buffer.reserve(data.size());
@@ -63,11 +41,8 @@ namespace str {
         }
         return std::move(buffer);
     }
-}
 
-namespace path {
-
-    static inline std::size_t complete(const fs::path& path, std::vector<std::string>& matches) 
+    std::size_t path_complete(const fs::path& path, std::vector<std::string>& matches) 
     {
         fs::path directory, prefix;
         if (fs::is_directory(path)) {
@@ -90,5 +65,43 @@ namespace path {
         }
 
         return matches.size();
+    }
+
+    std::string XToken::str() const {
+        return line.substr(begin_pos, end_pos - begin_pos);
+    }
+
+    char XToken::prev_char() const {
+        return begin_pos > 0 ? line[begin_pos - 1] : 0;
+    }
+
+    char XToken::next_char() const {
+        return end_pos < line.size() ? line[end_pos] : 0;
+    }
+
+    XToken parse_token(
+        const std::string& line, 
+        std::size_t cursor_pos,
+        const char* look_behind_chars,
+        const char* look_ahead_chars) 
+    {
+        XToken token{};
+        token.line = line;
+
+        if (cursor_pos == 0) {
+            token.begin_pos = 0;
+        } else {
+            token.begin_pos = line.find_last_of(look_behind_chars, cursor_pos > 0 ? cursor_pos - 1 : 0);
+            if (token.begin_pos == std::string::npos) {
+                token.begin_pos = 0;
+            } else {
+                token.begin_pos++;
+            }
+        }
+        token.end_pos = line.find_first_of(look_ahead_chars, cursor_pos); 
+        if (token.end_pos == std::string::npos) {
+            token.end_pos = line.size();
+        }
+        return std::move(token);
     }
 }

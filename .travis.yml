@@ -27,6 +27,7 @@ before_script:
 script:
   - cd $TRAVIS_BUILD_DIR/build
   - export FIFTPATH=$TRAVIS_BUILD_DIR/third-party/ton/crypto/fift/lib
+  - export FUNCPATH=$TRAVIS_BUILD_DIR/third-party/ton/crypto/smartcont
   - ./xeus-fift-test
 
 before_deploy:

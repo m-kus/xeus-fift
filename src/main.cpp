@@ -5,6 +5,15 @@
 
 #include "xinterpreter.hpp"
 
+using namespace xfift;
+
+#ifdef XFUNC_KERNEL
+    #define STARTING "Starting xeus-func kernel...\n\n"
+    typedef xfift::interpreter<xfift::XFunc> xint_impl;
+#else
+    #define STARTING "Starting xeus-fift kernel...\n\n"
+    typedef xfift::interpreter<xfift::XFift> xint_impl;
+#endif
 
 std::string extract_filename(int& argc, char* argv[])
 {
@@ -28,15 +37,15 @@ std::string extract_filename(int& argc, char* argv[])
 int main(int argc, char* argv[]) {
     std::string file_name = extract_filename(argc, argv);
 
-    using interpreter_ptr = std::unique_ptr<xfift::interpreter>;
-    interpreter_ptr interpreter = interpreter_ptr(new xfift::interpreter());
+    using interpreter_ptr = std::unique_ptr<xint_impl>;
+    interpreter_ptr interpreter = interpreter_ptr(new xint_impl());
 
     if (!file_name.empty()) {
         xeus::xconfiguration config = xeus::load_configuration(file_name);
         xeus::xkernel kernel(config, xeus::get_user_name(), std::move(interpreter));
         
         std::clog <<
-            "Starting xeus-fift kernel...\n\n"
+            STARTING
             "If you want to connect to this kernel from an other client, you can use"
             " the " + file_name + " file.\n";
 
@@ -46,7 +55,7 @@ int main(int argc, char* argv[]) {
 
         const auto& config = kernel.get_config();
         std::clog <<
-            "Starting xeus-fift kernel...\n\n"
+            STARTING
             "If you want to connect to this kernel from an other client, just copy"
             " and paste the following content inside of a `kernel.json` file. And then run for example:\n\n"
             "# jupyter console --existing kernel.json\n\n"

@@ -201,12 +201,12 @@ def gen_docstring_hpp():
     word_definitions = get_word_definitions()
     asm_definitions = get_asm_definitions()
     register_definitions = get_register_definitions() + extra_definitions
-    template = read_file('src/docstring.hpp.in')
+    template = read_file('src/xfift/docstring.hpp.in')
     placeholder = next(line for line in template.split('\n') if line.endswith('item_template'))
     item_template = placeholder.rstrip('// item_template')
     docs = '\n'.join(map(lambda x: item_template.format(**x), word_definitions + asm_definitions + register_definitions))
     data = template.replace(placeholder, docs)
-    write_file('src/docstring.hpp', data)
+    write_file('src/xfift/docstring.hpp', data)
 
 
 if __name__ == '__main__':

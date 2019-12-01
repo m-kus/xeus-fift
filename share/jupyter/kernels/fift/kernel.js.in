@@ -5,9 +5,7 @@ define([
     var builtin_words = /(?<=\s|^)(?:(builtin_words))(?=\s|$)/;
     var fift_words = /(?<=\s|^)(?:(fift_words))(?=\s|$)/;
     var asm_words = /(?<=\s|^)(?:(asm_words))(?=\s|$)/;
-    console.log("Here I am");
     var onload = function() {
-        console.log("Yeeeeee");
         CodeMirror.defineSimpleMode("fift", {
             start: [
                 // strings

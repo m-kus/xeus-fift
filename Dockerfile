@@ -11,7 +11,7 @@ COPY . /xeus-fift/
 
 WORKDIR /xeus-fift/build
 RUN cmake ..
-RUN make xeus-fift
+RUN make
 
 RUN export XFIFT_VERSION=$(bash /xeus-fift/scripts/xfift_version.sh) \
     && echo "Jupyter kernel for the Fift language\n" > description-pak \

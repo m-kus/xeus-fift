@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15.2)
 project(xeus-fift)
 
-set(EXECUTABLE_NAME xeus-fift)
 set(BUILD_SHARED_LIBS NO CACHE BOOL "" FORCE)
 set(BUILD_STATIC_LIBS YES CACHE BOOL "" FORCE)
 
@@ -10,10 +9,17 @@ set(BUILD_STATIC_LIBS YES CACHE BOOL "" FORCE)
 
 include(GNUInstallDirs)
 
+set(XFIFT_EXE xeus-fift)
+set(XFUNC_EXE xeus-func)
+
 # We generate the kernel.json file, given the installation prefix and the executable name
 configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels/fift/kernel.json.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels/fift/kernel.json"
+)
+configure_file (
+    "${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels/func/kernel.json.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/share/jupyter/kernels/func/kernel.json"
 )
 
 # Dependencies
@@ -61,13 +67,18 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     endif()
 endif()
 
-# Target and link
-# ===============
+# Target and link xeus-fift
+# =========================
 
-file(GLOB_RECURSE XFIFT_SRC "${CMAKE_SOURCE_DIR}/src/*")
+set(XFIFT_SRC 
+    "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xutil.cpp"
+)
 
-add_executable(${EXECUTABLE_NAME} src/main.cpp ${XFIFT_SRC})
-include_directories(${EXECUTABLE_NAME} PUBLIC
+add_executable(${XFIFT_EXE} src/main.cpp ${XFIFT_SRC})
+include_directories(${XFIFT_EXE} PUBLIC ${CMAKE_SOURCE_DIR}/src)
+include_directories(${XFIFT_EXE} SYSTEM PUBLIC
     ${CMAKE_SOURCE_DIR}/third-party
     ${CMAKE_SOURCE_DIR}/third-party/xeus/include
     ${CMAKE_SOURCE_DIR}/third-party/nlohmann_json/include
@@ -75,27 +86,75 @@ include_directories(${EXECUTABLE_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/third-party/xtl/include
     ${CMAKE_SOURCE_DIR}/third-party/cppzmq
 )
-target_link_libraries(${EXECUTABLE_NAME} PUBLIC 
+target_link_libraries(${XFIFT_EXE} PUBLIC 
     libzmq-static
     xeus_static 
     fift-lib
+    func-lib
     stdc++fs
 )
 
 if (APPLE)
-    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+    set_target_properties(${XFIFT_EXE} PROPERTIES
         MACOSX_RPATH ON
     )
 else()
-    set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+    set_target_properties(${XFIFT_EXE} PROPERTIES
         BUILD_WITH_INSTALL_RPATH 1
         SKIP_BUILD_RPATH FALSE
     )
 endif()
 
-set_target_properties(${EXECUTABLE_NAME} PROPERTIES
+set_target_properties(${XFIFT_EXE} PROPERTIES
     INSTALL_RPATH_USE_LINK_PATH TRUE
 )
+
+# Target and link xeus-func
+# =========================
+
+set(XFUNC_SRC 
+    "${CMAKE_SOURCE_DIR}/src/xfunc/xfunc.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/symguard.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/codegen.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/preproc.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xutil.cpp"
+)
+
+add_executable(${XFUNC_EXE} src/main.cpp ${XFUNC_SRC})
+target_compile_definitions(${XFUNC_EXE} PUBLIC -DXFUNC_KERNEL)
+target_include_directories(${XFUNC_EXE} SYSTEM PUBLIC
+    ${CMAKE_SOURCE_DIR}/third-party
+    ${CMAKE_SOURCE_DIR}/third-party/xeus/include
+    ${CMAKE_SOURCE_DIR}/third-party/nlohmann_json/include
+    ${CMAKE_SOURCE_DIR}/third-party/libzmq/include
+    ${CMAKE_SOURCE_DIR}/third-party/xtl/include
+    ${CMAKE_SOURCE_DIR}/third-party/cppzmq
+)
+target_link_libraries(${XFUNC_EXE} PUBLIC 
+    libzmq-static
+    xeus_static 
+    fift-lib
+    func-lib
+    stdc++fs
+)
+
+if (APPLE)
+    set_target_properties(${XFUNC_EXE} PROPERTIES
+        MACOSX_RPATH ON
+    )
+else()
+    set_target_properties(${XFUNC_EXE} PROPERTIES
+        BUILD_WITH_INSTALL_RPATH 1
+        SKIP_BUILD_RPATH FALSE
+    )
+endif()
+
+set_target_properties(${XFUNC_EXE} PROPERTIES
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+)
+
 
 # Testing
 # =======
@@ -105,9 +164,15 @@ set(XFIFT_TEST_EXE "xeus-fift-test")
 add_subdirectory(${CMAKE_SOURCE_DIR}/third-party/googletest EXCLUDE_FROM_ALL)
 
 set(SRC_TESTS
-    "${CMAKE_SOURCE_DIR}/src/xfift.cpp"
-    "${CMAKE_SOURCE_DIR}/src/xfift.hpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/xfunc.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/symguard.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/codegen.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfunc/preproc.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xfift/xfift.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xresult.cpp"
+    "${CMAKE_SOURCE_DIR}/src/xutil.cpp"
     "${CMAKE_SOURCE_DIR}/test/test_xfift.cpp"
+    "${CMAKE_SOURCE_DIR}/test/test_xfunc.cpp"
     "${CMAKE_SOURCE_DIR}/test/main.cpp"
 )
 
@@ -121,8 +186,9 @@ target_link_libraries(${XFIFT_TEST_EXE} PUBLIC
     gtest 
     gtest_main
     libzmq-static
-    xeus_static 
+    xeus_static
     fift-lib
+    func-lib
     stdc++fs
 )
 
@@ -134,7 +200,7 @@ add_test(NAME "test" COMMAND test)
 set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
 
 # Install my_kernel
-install(TARGETS ${EXECUTABLE_NAME}
+install(TARGETS ${XFIFT_EXE} ${XFUNC_EXE}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 # Configuration and data directories for jupyter and my_kernel
@@ -149,3 +215,7 @@ install(DIRECTORY ${MY_KERNELSPEC_DIR}
 # Copy Fift libraries
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/fift/lib/ 
         DESTINATION /usr/lib/fift)
+
+ # Copy FunC libraries
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/smartcont/stdlib.fc 
+        DESTINATION /usr/lib/func)
