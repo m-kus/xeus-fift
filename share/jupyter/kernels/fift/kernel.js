@@ -80,6 +80,15 @@ define([
         [...document.querySelectorAll('.code_cell .CodeMirror')].forEach(c => {
             c.CodeMirror.setOption('mode', 'fift');
         });
+        Jupyter.notebook.get_cells().forEach(function(c) {
+            if (c.cell_type == "code") {
+                c._options.cm_config['mode'] = 'fift';
+            }
+            else if (c.cell_type == "markdown") {
+                c.unrender();
+                c.render();
+            }
+        });
     }
     return { onload: onload }
 });
