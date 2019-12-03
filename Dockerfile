@@ -1,1 +1,1 @@
-FROM atomex/xeus-fift
+FROM atomex/xeus-fift:latest
