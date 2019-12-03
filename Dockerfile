@@ -2,6 +2,9 @@ FROM atomex/xeus-fift:latest
 
 ARG NB_USER
 ARG NB_UID
+
+USER root
+
 ENV USER ${NB_USER}
 ENV HOME /home/${NB_USER}
 
