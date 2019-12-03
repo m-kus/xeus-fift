@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/atomex-me/xeus-fift.svg?branch=master)](https://travis-ci.org/atomex-me/xeus-fift)
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/atomex/xeus-fift)](https://hub.docker.com/r/atomex/xeus-fift)
 [![made_with xeus](https://img.shields.io/badge/made_with-xeus-yellowgreen.svg)](https://github.com/QuantStack/xeus)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/atomex-me/xeus-fift/binder?filepath=func_cheat_sheet.ipynb)
 
 Jupyter kernels for the Fift and FunC languages (and TVM assembler) 
 
@@ -62,6 +62,9 @@ Print variables
 ```
 
 ## How to use
+
+### Run online!
+Powered by awesome Binder: https://mybinder.org/v2/gh/atomex-me/xeus-fift/binder?filepath=func_cheat_sheet.ipynb
 
 ### Run in docker
 0. Get the latest image from dockerhub (only when new releases are published)
