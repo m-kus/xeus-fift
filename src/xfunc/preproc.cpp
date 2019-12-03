@@ -53,7 +53,7 @@ namespace xfift {
             func_names.push_back("main");
 
             std::stringstream ss;
-            ss << "_ main() {\n" << expr;
+            ss << "_ main() impure {\n" << expr;
             std::size_t ending = expr.find_last_not_of(" \r\n\t");
             if (ending != std::string::npos && expr[ending] != ';') {
                 ss << ';';

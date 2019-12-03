@@ -88,7 +88,7 @@ namespace xfift {
     }
 
     XResult XResult::vm_result() {
-        std::regex vm_output_re("^(.+)\\s([0-9]{1,2})\\s\\n$");
+        std::regex vm_output_re("^(?:(.+)\\s)?([0-9]{1,2})\\s\\n$");
         std::smatch match;
 
         if (std::regex_match(output, match, vm_output_re)) {

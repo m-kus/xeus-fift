@@ -71,8 +71,8 @@ namespace xfift {
         std::copy(
             func_names.begin(), 
             func_names.end(), 
-            std::inserter(completion_, completion_.begin()));
-        
+            std::inserter(completion_, completion_.end()));
+
         std::stringstream ss(source);
         src::FileDescr fd{"stdin", true};
         std::string script_fif;
@@ -107,7 +107,7 @@ namespace xfift {
     XToken XFunc::code_complete(const std::string& expr, std::size_t cursor_pos, std::vector<std::string>& matches) 
     {
         // ~non_const_method | .const_method
-        XToken token = parse_token(expr, cursor_pos, " ~.(", " \"?()");
+        XToken token = parse_token(expr, cursor_pos, " \"\n~.=(", " \"\n()");
         if (token.prev_char() == '~') {
             token.begin_pos--;
         }
@@ -125,7 +125,7 @@ namespace xfift {
                     }
                 }
             } else {
-                std::for_each(completion.begin(), completion.end(), [&](const std::string& x) {
+                std::for_each(completion_.begin(), completion_.end(), [&](const std::string& x) {
                     if (std::equal(prefix.begin(), prefix.end(), x.begin())) {
                         matches.push_back(x);
                     }
@@ -137,7 +137,7 @@ namespace xfift {
     }
 
     XToken XFunc::code_inspect(const std::string& expr, std::size_t cursor_pos, std::string& tooltip) {
-        XToken token = parse_token(expr, cursor_pos, "\n~.;=><(", "\n() ");
+        XToken token = parse_token(expr, cursor_pos, " \n~.=(><;", " \n();");
         if (token.prev_char() == '~') {
             token.begin_pos--;
         }
