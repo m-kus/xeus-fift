@@ -19,3 +19,7 @@
 [submodule "third-party/googletest"]
 	path = third-party/googletest
 	url = https://github.com/google/googletest
+[submodule "binder"]
+	path = binder
+	url = git@github.com:atomex-me/xeus-fift.git
+	branch = binder
