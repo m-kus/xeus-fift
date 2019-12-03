@@ -34,9 +34,13 @@ RUN pip install notebook
 COPY --from=builder /xeus-fift/build/xeus-fift.deb /tmp/xeus-fift.deb
 RUN dpkg -i /tmp/xeus-fift.deb
 
-RUN useradd -ms /bin/bash jupyter
-USER jupyter
-WORKDIR /home/jupyter
+ARG NB_USER=jupyter
+ARG NB_UID=1000
+ENV USER ${NB_USER}
+ENV HOME /home/${NB_USER}
+
+RUN useradd -m -u ${NB_UID} -s /bin/bash ${NB_USER}
+WORKDIR ${HOME}
 
 EXPOSE 8888
 ENTRYPOINT [ "jupyter",  "notebook", "--port=8888", "--ip=0.0.0.0", "--no-browser", "--no-mathjax"]

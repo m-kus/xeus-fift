@@ -73,6 +73,13 @@ define([
             mode: "fift",
             name: "Fift"
         });
+
+        // Force mode on refresh
+        // Big thanks to https://github.com/kelvich for this solution
+        IPython.CodeCell.options_default["cm_config"]["mode"] = "fift";
+        [...document.querySelectorAll('.code_cell .CodeMirror')].forEach(c => {
+            c.CodeMirror.setOption('mode', 'fift');
+        });
     }
     return { onload: onload }
 });
