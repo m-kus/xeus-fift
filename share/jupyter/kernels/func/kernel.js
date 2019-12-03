@@ -71,7 +71,7 @@ define([
                     state.tokenize = tokenMethod(ch, "string-2");
                     return "variable-2";
                 }
-                if (ch == "~") {
+                if (ch == "~") {    
                     state.tokenize = tokenMethod(ch, "def");
                     return "def";
                 }
@@ -269,7 +269,14 @@ define([
             mime: "text/x-func",
             mode: "func",
             name: "FunC"
-        });      
+        });
+        
+        // Force mode on refresh
+        // Big thanks to https://github.com/kelvich for this solution
+        IPython.CodeCell.options_default["cm_config"]["mode"] = "func";
+        [...document.querySelectorAll('.code_cell .CodeMirror')].forEach(c => {
+            c.CodeMirror.setOption('mode', 'func');
+        });
     }
     return { onload: onload }
 });
