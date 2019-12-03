@@ -92,8 +92,9 @@ define([
                 curPunc = ch;
                 return null;
             }
-            if (stream.match(/^-?(?:0x[a-f\d]+)|(?:\d+)/i, true)) {
-                return "number"
+            if ((ch == "-" && stream.eat(/\d/)) || /\d/.test(ch)) {
+                stream.eatWhile(/[a-f\dx]/i);
+                return "number";
             }
             if (/[+\-*&%=<>!?|\/~\^]/.test(ch)) {
                 stream.eatWhile(/[+\-*&%=<>!?|\/~\^]/);
@@ -276,6 +277,15 @@ define([
         IPython.CodeCell.options_default["cm_config"]["mode"] = "func";
         [...document.querySelectorAll('.code_cell .CodeMirror')].forEach(c => {
             c.CodeMirror.setOption('mode', 'func');
+        });
+        Jupyter.notebook.get_cells().forEach(function(c) {
+            if (c.cell_type == "code") {
+                c._options.cm_config['mode'] = 'func';
+            }
+            else if (c.cell_type == "markdown") {
+                c.unrender();
+                c.render();
+            }
         });
     }
     return { onload: onload }
