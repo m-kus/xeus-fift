@@ -76,7 +76,7 @@ namespace xfift {
 
     XToken XFift::code_complete(const std::string& expr, std::size_t cursor_pos, std::vector<std::string>& matches)
     {
-        XToken token = parse_token(expr, cursor_pos, " \"", " \"");
+        XToken token = parse_token(expr, cursor_pos, " \"\n", " \"\n");
         std::string prefix = token.str();
 
         if (!prefix.empty() && token.prev_char() == '"') {
@@ -100,7 +100,7 @@ namespace xfift {
 
     XToken XFift::code_inspect(const std::string& expr, std::size_t cursor_pos, std::string& tooltip) 
     {
-        XToken token = parse_token(expr, cursor_pos, " \"", " \"");
+        XToken token = parse_token(expr, cursor_pos, " \"\n", " \"\n");
         tooltip = get_docstring(token.str());
         return std::move(token);
     }

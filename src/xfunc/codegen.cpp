@@ -34,16 +34,16 @@ namespace xfift {
             assert(func_sym->value);
             assert(func_sym->value->type == sym::SymValBase::_Func);
             funC::SymValCodeFunc* func_val = dynamic_cast<funC::SymValCodeFunc*>(func_sym->value);
+            if (!func_val->code) {
+                std::cout << "function `" << name << "` declared but has no body\n";
+                continue;
+            }
 
             assert(func_val);
             if (func_val->method_id.is_null()) {
                 decl << "DECLPROC " << name << "\n";
             } else {
                 decl << func_val->method_id << " DECLMETHOD " << name << "\n";
-            }
-            
-            if (!func_val->code) {
-                throw src::Fatal{"function `" + name + "` declared but has no body"};
             }
             
             funC::CodeBlob* code = func_val->code;

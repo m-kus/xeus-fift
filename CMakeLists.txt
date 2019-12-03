@@ -217,5 +217,6 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/fift/lib/
         DESTINATION /usr/lib/fift)
 
  # Copy FunC libraries
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/smartcont/stdlib.fc 
-        DESTINATION /usr/lib/func)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/third-party/ton/crypto/smartcont/ 
+        DESTINATION /usr/lib/func
+        FILES_MATCHING PATTERN "*.fc")
