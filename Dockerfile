@@ -1,4 +1,4 @@
-FROM atomex/xeus-fift:binder
+FROM atomex/xeus-fift:0.2.1
 
 ARG NB_USER
 ARG NB_UID
@@ -16,3 +16,5 @@ RUN adduser --disabled-password \
 
 WORKDIR ${HOME}
 USER ${USER}
+
+ENTRYPOINT []
