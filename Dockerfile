@@ -8,6 +8,7 @@ USER root
 ENV USER ${NB_USER}
 ENV HOME /home/${NB_USER}
 
+RUN userdel --force jupyter
 RUN adduser --disabled-password \
     --gecos "Default user" \
     --uid ${NB_UID} \
