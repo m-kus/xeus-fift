@@ -1,4 +1,4 @@
-FROM atomex/xeus-fift:latest
+FROM atomex/xeus-fift:binder
 
 ARG NB_USER
 ARG NB_UID
@@ -16,4 +16,3 @@ RUN adduser --disabled-password \
 
 WORKDIR ${HOME}
 USER ${USER}
-CMD ["jupyter", "notebook", "--ip", "0.0.0.0"]
