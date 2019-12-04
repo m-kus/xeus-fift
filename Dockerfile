@@ -14,7 +14,8 @@ RUN adduser --disabled-password \
     --uid ${NB_UID} \
     ${NB_USER}
 
-COPY --chown=${NB_USER}:${NB_USER} func_cheat_sheet.ipynb ${HOME}/
+COPY func_cheat_sheet.ipynb ${HOME}/
+RUN chown -R ${NB_USER}:${NB_USER} ${HOME}/
 
 WORKDIR ${HOME}
 USER ${USER}
