@@ -61,10 +61,11 @@ namespace xfift {
         std::string source = expr;
         
         try {
-            resolve_includes(source);
+            resolve_includes(source, func_path_);
             parse_functions(source, func_names);
             force_main(source, func_names);
         } catch (const std::string& msg) {
+            std::cerr << msg << std::endl;
             return XResult(msg);
         }
 

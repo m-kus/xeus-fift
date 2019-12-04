@@ -12,7 +12,7 @@ using namespace sym;
 namespace xfift {
 
     void reset_global_state();
-    void resolve_includes(std::string& expr);
+    void resolve_includes(std::string& expr, const std::vector<std::string>& func_path);
     void parse_functions(const std::string& expr, std::vector<std::string>& func_names);
     void force_main(std::string& expr, std::vector<std::string>& func_names);
     std::string generate_fift_script();

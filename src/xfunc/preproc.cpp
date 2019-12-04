@@ -9,7 +9,7 @@ namespace xfift {
         "asm", "if", "ifnot", "then", "else", "elseif", "elseifnot"
     };
 
-    void resolve_includes(std::string& expr) {
+    void resolve_includes(std::string& expr, const std::vector<std::string>& func_path) {
         std::regex include_re("^#include\\s\"([^\"]+)\"");
         std::smatch match;
         std::stringstream ss;
@@ -18,10 +18,21 @@ namespace xfift {
         while (std::regex_search(expr, match, include_re)) {
             assert(match.size() == 2);
             expr = match.suffix();
-           
-            std::ifstream include(match.str(1));
+
+            fs::path path{match.str(1)};
+            if (!path.has_parent_path()) {
+                for (auto& dir : func_path) {
+                    auto p = fs::path{dir} / path;
+                    if (fs::exists(p)) {
+                        path = p;
+                        break;
+                    }
+                }
+            }
+
+            std::ifstream include(path);
             if (include.fail()) {
-                throw "failed to load file `" + match.str(1) + "`";
+                throw "failed to load `" + path.string() + "`";
             }
             ss << include.rdbuf() << "\n";
             resolved = true;
@@ -34,7 +45,7 @@ namespace xfift {
     }
 
     void parse_functions(const std::string& expr, std::vector<std::string>& func_names) {
-        std::regex func_name_re("\\s(~?[_\\w:#]+[?=]?) *\\([_,\\w\\s]*\\) *(?:[a-z]|\\{)");
+        std::regex func_name_re("^[^;]*\\s(~?[_\\w:#]+[?=]?) *\\([_,\\w\\s]*\\) *(?:[a-z]|\\{)");
        
         for (std::sregex_iterator it = std::sregex_iterator(expr.begin(), expr.end(), func_name_re);
                                   it != std::sregex_iterator();
