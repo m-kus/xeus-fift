@@ -75,11 +75,20 @@ namespace xfift {
             func_names.push_back("main");
 
             std::stringstream ss;
-            ss << "_ main() impure {\n" << expr;
-            std::size_t ending = expr.find_last_not_of(" \r\n\t");
-            if (ending != std::string::npos && expr[ending] != ';') {
-                ss << ';';
+            ss << "_ main() impure {\n";
+
+            auto last = get_last_expression(expr, ';');
+            if (last.begin_pos > 0) {
+                ss << expr.substr(0, last.begin_pos);
             }
+
+            auto last_expr = strip(last.str());
+            if (std::regex_match(last_expr, std::regex(R"(^[_\w]+$)"))) {
+                ss << "return " << last_expr << ";";
+            } else {
+                ss << last_expr << ";";
+            }
+
             ss << "\n}";
             expr = ss.str();
         }
