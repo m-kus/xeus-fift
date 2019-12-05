@@ -104,4 +104,31 @@ namespace xfift {
         }
         return std::move(token);
     }
+
+    XToken get_last_expression(const std::string& s, char ending)
+    {
+        XToken token{};
+        token.line = s;
+
+        token.end_pos = s.find_last_not_of(" \t\r\n");
+        if (token.end_pos == std::string::npos) {
+            token.end_pos = s.size();
+        } else {
+            token.end_pos++;
+        }
+
+        token.begin_pos = s.find_last_of('\n', token.end_pos);
+        if (token.begin_pos == std::string::npos) {
+            token.begin_pos = 0;
+        } else {
+            token.begin_pos++;
+        }
+
+        auto ending_pos = s.find_first_of(ending, token.begin_pos);
+        if (ending_pos != std::string::npos) {
+            token.end_pos = ending_pos;
+        }
+        
+        return std::move(token);
+    }
 }

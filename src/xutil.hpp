@@ -44,6 +44,10 @@ namespace xfift {
         const char* look_behind_chars,
         const char* look_ahead_chars
     );
+    XToken get_last_expression(
+        const std::string& s,
+        char ending
+    );
 
     struct XResult
     {
