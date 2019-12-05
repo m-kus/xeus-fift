@@ -50,7 +50,7 @@ namespace xfift {
             if (name == "main") {
                 has_main = true;
                 force_return(code);
-                code->print(std::cout, 15);
+                //code->print(std::cout, 15);
             }
             
             code->simplify_var_types();

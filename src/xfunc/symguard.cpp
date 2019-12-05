@@ -29,9 +29,13 @@ namespace xfift {
         for (int i = 0; i < sym::symbols.hprime; i++) {
             clear_sym_def(sym::sym_def, i);
             clear_sym_def(sym::global_sym_def, i);
+            auto symbol = sym::symbols[i];
+            if (symbol) {
+                symbol->str = "";
+                symbol->idx = 0;
+            }
         }
-        
-        sym::symbols = sym::SymTable<100003>{};
+
         std::clog << "Global state is clear\n";
     }
 
