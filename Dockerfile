@@ -1,4 +1,4 @@
-FROM atomex/xeus-fift:0.2.2
+FROM atomex/xeus-fift:release
 
 ARG NB_USER
 ARG NB_UID
