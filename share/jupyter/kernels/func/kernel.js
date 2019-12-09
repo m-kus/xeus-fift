@@ -80,6 +80,10 @@ define([
                     return "operator";
                 }
             }
+            if (ch == "{" && stream.eat("-")) {
+                state.tokenize = tokenComment;
+                return "comment";
+            }
             if (ch == ";" && stream.eat(";")) { 
                 stream.skipToEnd();
                 return "comment";
@@ -96,8 +100,8 @@ define([
                 stream.eatWhile(/[a-f\dx]/i);
                 return "number";
             }
-            if (/[+\-*&%=<>!?|\/~\^]/.test(ch)) {
-                stream.eatWhile(/[+\-*&%=<>!?|\/~\^]/);
+            if (/[:+\-*&%=<>!?|\/~\^]/.test(ch)) {
+                stream.eatWhile(/[:+\-*&%=<>!?|\/~\^]/);
                 return "operator";
             }
 
@@ -154,6 +158,16 @@ define([
                 }
                 return style;
             }
+        }
+
+        function tokenComment(stream, state) {
+            if (stream.skipTo("-}")) {
+                stream.eatWhile(/[-\}]/);
+                state.tokenize = null;
+            } else {
+                stream.skipToEnd();
+            }
+            return "comment";
         }
 
         function startState(basecolumn) {
@@ -258,6 +272,8 @@ define([
             indent: indent,
             electricInput: /^\s*[{}]$/,
             lineComment: ";;",
+            blockCommentStart: "{-",
+            blockCommentEnd: "-}",
             fold: "brace"
         };
     }
