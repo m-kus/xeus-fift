@@ -100,12 +100,12 @@ namespace xfift {
 
             if (res.code != 0) {
                 res.vmlog = vmlog;
-                res.ename = "VM error";
+                res.ename = "VM exception";
 
                 if (res.code < (int)vm::Excno::total) {
                     res.evalue = vm::get_exception_msg(static_cast<vm::Excno>(res.code));
                 } else {
-                    res.evalue = "unknown code " + match.str(2);
+                    res.evalue = "exit code " + match.str(2);
                 }
                 
                 res.traceback.push_back(res.ename + ": " + res.evalue);
