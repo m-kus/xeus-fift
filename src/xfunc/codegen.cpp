@@ -68,7 +68,7 @@ namespace xfift {
             bool inline_ref = (func_val->flags & 2);
             impl << name << " PROC" << (inline_ref ? "REF" : "") << ":<{\n";
             if (name == "main") {
-                impl << "DEBUGON\n";
+                impl << "  DEBUGON\n";
             }
             code->generate_code(impl, Stack::_DisableOpt, 1);
             impl << "}>\n";

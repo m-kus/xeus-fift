@@ -96,8 +96,11 @@ namespace xfift {
         }
             
         if (!script_fif.empty()) {
+            std::cout << script_fif << std::endl;
+
             XFift fift;
             fift.configure();
+            
             XResult res = fift.do_interpret(script_fif);
             return res.code == 0 ? res.vm_result() : res;
         }
